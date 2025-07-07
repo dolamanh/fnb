@@ -45,6 +45,7 @@ container.bind(TYPES.UserRepository).toDynamicValue(() => {
   return new UserRepository(localDataSource, remoteDataSource);
 });
 
+// Use Cases - đơn giản hóa, không cần type complex
 container.bind(TYPES.GetUsersUseCase).toDynamicValue(() => {
   const userRepository = container.get<IUserRepository>(TYPES.UserRepository);
   return new GetUsersUseCase(userRepository);

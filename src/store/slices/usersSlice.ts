@@ -2,10 +2,6 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { User } from '../../core/entities/User';
 import { container } from '../../di/container';
 import { TYPES } from '../../di/types';
-import type { IGetUsersUseCase } from '../../core/usecases/user/IGetUsersUseCase';
-import type { ICreateUserUseCase } from '../../core/usecases/user/ICreateUserUseCase';
-import type { IUpdateUserUseCase } from '../../core/usecases/user/IUpdateUserUseCase';
-import type { IDeleteUserUseCase } from '../../core/usecases/user/IDeleteUserUseCase';
 
 // State interface
 export interface UsersState {
@@ -26,7 +22,7 @@ export const fetchUsers = createAsyncThunk(
   'users/fetchUsers',
   async (_, { rejectWithValue }) => {
     try {
-      const getUsersUseCase = container.get<IGetUsersUseCase>(TYPES.GetUsersUseCase);
+      const getUsersUseCase = container.get(TYPES.GetUsersUseCase) as any;
       const users = await getUsersUseCase.execute();
       return users;
     } catch (error) {
@@ -41,7 +37,7 @@ export const createUser = createAsyncThunk(
   'users/createUser',
   async (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>, { rejectWithValue }) => {
     try {
-      const createUserUseCase = container.get<ICreateUserUseCase>(TYPES.CreateUserUseCase);
+      const createUserUseCase = container.get(TYPES.CreateUserUseCase) as any;
       const newUser = await createUserUseCase.execute(userData);
       return newUser;
     } catch (error) {
@@ -54,10 +50,10 @@ export const createUser = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
   'users/updateUser',
-  async ({ id, userData }: { id: string; userData: Partial<User> }, { rejectWithValue }) => {
+  async (input: { id: string; userData: Partial<User> }, { rejectWithValue }) => {
     try {
-      const updateUserUseCase = container.get<IUpdateUserUseCase>(TYPES.UpdateUserUseCase);
-      const updatedUser = await updateUserUseCase.execute(id, userData);
+      const updateUserUseCase = container.get(TYPES.UpdateUserUseCase) as any;
+      const updatedUser = await updateUserUseCase.execute(input);
       return updatedUser;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to update user';
@@ -71,7 +67,7 @@ export const deleteUser = createAsyncThunk(
   'users/deleteUser',
   async (id: string, { rejectWithValue }) => {
     try {
-      const deleteUserUseCase = container.get<IDeleteUserUseCase>(TYPES.DeleteUserUseCase);
+      const deleteUserUseCase = container.get(TYPES.DeleteUserUseCase) as any;
       await deleteUserUseCase.execute(id);
       return id;
     } catch (error) {

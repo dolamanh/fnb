@@ -1,24 +1,25 @@
 import { injectable, inject } from 'inversify';
-import { IGetUsersUseCase } from './IGetUsersUseCase';
-import type { IUserRepository } from '../../repositories/IUserRepository';
+import { IUseCase } from '../base/IBaseUseCase';
 import { User } from '../../entities/User';
+import type { IUserRepository } from '../../repositories/IUserRepository';
 import { TYPES } from '../../../di/types';
 
+// Simple types inline
+type GetUsersInput = void;
+type GetUsersOutput = User[];
+
 @injectable()
-export class GetUsersUseCase implements IGetUsersUseCase {
+export class GetUsersUseCase implements IUseCase<GetUsersInput, GetUsersOutput> {
   constructor(
     @inject(TYPES.UserRepository) private userRepository: IUserRepository
   ) {}
 
-  async execute(): Promise<User[]> {
+  async execute(): Promise<GetUsersOutput> {
     try {
-      // First try to sync with remote API
-      await this.userRepository.syncUsers();
       return await this.userRepository.getUsers();
     } catch (error) {
-      // If sync fails, return local data
-      console.warn('Failed to sync users, returning local data:', error);
-      return await this.userRepository.getUsers();
+      console.error('Failed to get users:', error);
+      throw error;
     }
   }
 }
