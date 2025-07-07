@@ -1,97 +1,289 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# FnB - React Native App với Clean Architecture + Redux Toolkit
 
-# Getting Started
+Ứng dụng React Native được xây dựng với Clean Architecture, WatermelonDB, Dependency Injection, Redux Toolkit và Axios cho RESTful API.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## 🏗️ Architecture Overview
 
-## Step 1: Start Metro
+Dự án này tuân theo nguyên tắc Clean Architecture với các layer sau:
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+### Core Layer
+- **Entities**: Business objects của ứng dụng (`User`)
+- **Use Cases**: Business logic và rules (`GetUsersUseCase`, `CreateUserUseCase`, etc.)
+- **Repository Interfaces**: Contracts cho data access
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+### Data Layer
+- **Models**: WatermelonDB models (`UserModel`)
+- **Data Sources**: 
+  - Remote Data Source (API calls với Axios)
+  - Local Data Source (WatermelonDB operations)
+- **Repository Implementations**: Kết hợp remote và local data sources
 
-```sh
-# Using npm
-npm start
+### Presentation Layer
+- **Screens**: UI screens (`UserListScreen`)
+- **Components**: Reusable UI components (`UserItem`, `UserForm`)
+- **State Management**: Redux Toolkit với typed hooks
 
-# OR using Yarn
-yarn start
+### State Management Layer
+- **Redux Store**: Centralized state management
+- **Slices**: Redux Toolkit slices với async thunks
+- **Typed Hooks**: Type-safe Redux hooks (`useAppDispatch`, `useAppSelector`)
+
+### Dependency Injection
+- **Container**: Inversify container để manage dependencies
+- **Types**: Symbol definitions cho DI
+
+## 📁 Project Structure
+
+```
+src/
+├── core/
+│   ├── entities/
+│   │   └── User.ts
+│   ├── repositories/
+│   │   └── IUserRepository.ts
+│   └── usecases/
+│       └── user/
+│           ├── IGetUsersUseCase.ts
+│           ├── GetUsersUseCase.ts
+│           ├── ICreateUserUseCase.ts
+│           ├── CreateUserUseCase.ts
+│           ├── IUpdateUserUseCase.ts
+│           ├── UpdateUserUseCase.ts
+│           ├── IDeleteUserUseCase.ts
+│           └── DeleteUserUseCase.ts
+├── data/
+│   ├── models/
+│   │   ├── UserModel.ts
+│   │   └── schema.ts
+│   ├── datasources/
+│   │   ├── IApiService.ts
+│   │   ├── ApiService.ts
+│   │   ├── IDatabaseService.ts
+│   │   ├── DatabaseService.ts
+│   │   ├── IUserRemoteDataSource.ts
+│   │   ├── UserRemoteDataSource.ts
+│   │   ├── IUserLocalDataSource.ts
+│   │   └── UserLocalDataSource.ts
+│   └── repositories/
+│       └── UserRepository.ts
+├── presentation/
+│   ├── screens/
+│   │   └── UserListScreen.tsx
+│   └── components/
+│       ├── UserItem.tsx
+│       └── UserForm.tsx
+├── store/
+│   ├── index.ts
+│   ├── hooks.ts
+│   └── slices/
+│       └── usersSlice.ts
+├── di/
+│   ├── types.ts
+│   └── container.ts
+├── utils/
+│   ├── errorHandler.ts
+│   └── CircuitBreaker.ts
+├── debug/
+│   └── TestDI.ts
+└── index.ts
 ```
 
-## Step 2: Build and run your app
+## 🚀 Key Features
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+### 1. Clean Architecture
+- Separation of concerns
+- Dependency inversion
+- Testable code structure
+- Independent of frameworks and UI
 
-### Android
+### 2. WatermelonDB
+- Offline-first local database
+- Reactive database queries
+- Optimistic updates
+- Sync capabilities với remote API
 
-```sh
-# Using npm
+### 3. Dependency Injection
+- Sử dụng Inversify container
+- Loose coupling between components
+- Easy testing và mocking
+- Configurable dependencies
+
+### 4. RESTful API Integration
+- Axios HTTP client
+- Request/Response interceptors
+- Error handling
+- Automatic retry logic
+
+### 5. Redux Toolkit State Management
+- **Centralized State**: Single source of truth
+- **Predictable Updates**: Immutable state updates
+- **Async Thunks**: Handle async operations
+- **Type Safety**: Full TypeScript support
+- **DevTools**: Redux DevTools integration
+
+### 6. Modular Design
+- Feature-based modules
+- Reusable components
+- Scalable architecture
+
+## 🛠️ Technologies Used
+
+- **React Native**: Mobile framework
+- **TypeScript**: Type safety
+- **Redux Toolkit**: State management
+- **React Redux**: React bindings for Redux
+- **WatermelonDB**: Local database
+- **Axios**: HTTP client
+- **Inversify**: Dependency injection
+- **React Hooks**: UI state management
+
+## 📱 Features
+
+### User Management
+- ✅ List all users
+- ✅ Create new user
+- ✅ Update user information
+- ✅ Delete user
+- ✅ Offline support
+- ✅ Auto-sync với API
+- ✅ Pull to refresh
+- ✅ Error handling
+
+### Data Flow
+1. **UI Action**: User tương tác với UI component
+2. **Redux Action**: Component dispatch Redux action (async thunk)
+3. **Business Logic**: Async thunk gọi Use Cases thông qua DI
+4. **Data Access**: Use Cases gọi Repository
+5. **API/DB**: Repository gọi Remote/Local Data Sources
+6. **State Update**: Redux state được update
+7. **UI Re-render**: Components re-render với state mới
+
+### Redux Flow
+```
+UI Component → dispatch(action) → Redux Store → Async Thunk → Use Cases → Repository → Data Sources → API/DB
+                                     ↓
+UI Re-render ← Updated State ← Redux Store ← Fulfilled Action ← Response Data
+```
+
+## 🔧 Setup và Installation
+
+1. **Clone repository**
+```bash
+git clone <repository-url>
+cd fnb
+```
+
+2. **Install dependencies**
+```bash
+npm install --legacy-peer-deps
+```
+
+3. **Configure Android SDK** (nếu cần)
+```bash
+# Tạo local.properties file
+echo "sdk.dir=C:\\Users\\ADMIN\\AppData\\Local\\Android\\Sdk" > android/local.properties
+```
+
+4. **iOS setup** (nếu develop cho iOS)
+```bash
+cd ios && pod install && cd ..
+```
+
+5. **Start Metro Bundler**
+```bash
+npm start
+```
+
+6. **Run the app**
+```bash
+# Android
 npm run android
 
-# OR using Yarn
-yarn android
-```
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+# iOS
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## 🏗️ Architecture Layers
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+### 1. **Presentation Layer**
+- React Native components và screens
+- Redux store connection qua typed hooks
+- UI logic và user interactions
 
-## Step 3: Modify your app
+### 2. **State Management Layer** 
+- Redux Toolkit store
+- Slices với async thunks
+- Centralized state management
 
-Now that you have successfully run the app, let's make changes!
+### 3. **Business Logic Layer**
+- Use Cases chứa business rules
+- Được gọi từ Redux async thunks
+- Independent từ UI và data sources
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+### 4. **Data Layer**
+- Repository pattern
+- Remote và Local data sources
+- WatermelonDB models
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+### 5. **Dependency Injection Layer**
+- Inversify container
+- Interface-based dependencies
+- Loose coupling between layers
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+## 🧪 Testing
 
-## Congratulations! :tada:
+Với Clean Architecture và Redux, việc testing trở nên dễ dàng:
 
-You've successfully run and modified your React Native App. :partying_face:
+- **Unit Tests**: Test các Use Cases và business logic
+- **Redux Tests**: Test reducers, actions, và async thunks
+- **Integration Tests**: Test Repository implementations
+- **UI Tests**: Test React components với Redux state
 
-### Now what?
+## 🔄 Data Synchronization
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+App implement offline-first approach:
 
-# Troubleshooting
+1. **Local First**: Tất cả operations được thực hiện trên local database trước
+2. **Background Sync**: Sync với remote API ở background
+3. **Conflict Resolution**: Handle conflicts khi sync
+4. **Retry Logic**: Automatic retry khi network có vấn đề
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+## 🎯 Best Practices
 
-# Learn More
+1. **Single Responsibility**: Mỗi class có một responsibility duy nhất
+2. **Interface Segregation**: Sử dụng interfaces để define contracts
+3. **Dependency Inversion**: Depend on abstractions, not concretions
+4. **Error Handling**: Proper error handling ở tất cả layers
+5. **Type Safety**: Sử dụng TypeScript cho type safety
 
-To learn more about React Native, take a look at the following resources:
+## 🚀 Future Enhancements
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+- [ ] Authentication & Authorization
+- [ ] Real-time updates với WebSocket
+- [ ] Image upload functionality
+- [ ] Advanced search và filtering
+- [ ] Data validation với Yup
+- [ ] Unit tests với Jest
+- [ ] E2E tests với Detox
+- [ ] Performance monitoring
+- [ ] Redux Persist for offline state
+- [ ] Optimistic UI updates
+- [ ] Background sync với Redux Saga
+
+## 📝 Notes
+
+- **State Management**: Sử dụng Redux Toolkit thay vì custom hooks
+- **API endpoint**: Hiện tại sử dụng JSONPlaceholder cho demo
+- **Production**: Cần cấu hình real API endpoint trong production
+- **Database**: WatermelonDB sẽ được tạo tự động khi app khởi động
+- **Dependencies**: Tất cả dependencies được inject qua DI container
+- **TypeScript**: Full type safety với Redux Toolkit và TypeScript
+- **DevTools**: Redux DevTools được enable trong development mode
+
+## 🤝 Contributing
+
+1. Fork the project
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
