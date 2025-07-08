@@ -3,19 +3,19 @@ import { Container } from 'inversify';
 import { TYPES } from './types';
 
 // Direct imports with types
-import { ApiService } from '../data/datasources/ApiService';
-import { DatabaseService } from '../data/datasources/DatabaseService';
-import { UserRemoteDataSource } from '../data/datasources/UserRemoteDataSource';
-import { UserLocalDataSource } from '../data/datasources/UserLocalDataSource';
+import { ApiService } from '../data/services/implementations/ApiService';
+import { DatabaseService } from '../data/services/implementations/DatabaseService';
+import { UserRemoteDataSource } from '../data/datasources/implementations/UserRemoteDataSource';
+import { UserLocalDataSource } from '../data/datasources/implementations/UserLocalDataSource';
 import { UserRepository } from '../data/repositories/UserRepository';
 import { GetUsersUseCase } from '../core/usecases/user/GetUsersUseCase';
 import { CreateUserUseCase } from '../core/usecases/user/CreateUserUseCase';
 import { UpdateUserUseCase } from '../core/usecases/user/UpdateUserUseCase';
 import { DeleteUserUseCase } from '../core/usecases/user/DeleteUserUseCase';
-import type { IApiService } from '../data/datasources/IApiService';
-import type { IDatabaseService } from '../data/datasources/IDatabaseService';
-import type { IUserLocalDataSource } from '../data/datasources/IUserLocalDataSource';
-import type { IUserRemoteDataSource } from '../data/datasources/IUserRemoteDataSource';
+import type { IApiService } from '../data/services/interfaces/IApiService';
+import type { IDatabaseService } from '../data/services/interfaces/IDatabaseService';
+import type { IUserLocalDataSource } from '../data/datasources/interfaces/IUserLocalDataSource';
+import type { IUserRemoteDataSource } from '../data/datasources/interfaces/IUserRemoteDataSource';
 import type { IUserRepository } from '../core/repositories/IUserRepository';
 
 const container = new Container();

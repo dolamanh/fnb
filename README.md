@@ -4,50 +4,101 @@
 
 ## 🏗️ Architecture Overview
 
-Dự án này tuân theo nguyên tắc Clean Architecture với các layer sau:
+Dự án này tuân theo nguyên tắc Clean Architecture với cấu trúc package được tối ưu hóa cho việc phân tách rõ ràng interface và implementation:
 
-### Core Layer
-- **Entities**: Business objects của ứng dụng (`User`)
-- **Use Cases**: Business logic và rules (`GetUsersUseCase`, `CreateUserUseCase`, etc.)
+### Core Layer (Business Logic)
+- **Entities**: Business objects của ứng dụng (`User`, `Cart`)
+- **Use Cases**: Business logic với interface đơn giản `IUseCase<TInput, TOutput>`
 - **Repository Interfaces**: Contracts cho data access
 
-### Data Layer
-- **Models**: WatermelonDB models (`UserModel`)
-- **Data Sources**: 
-  - Remote Data Source (API calls với Axios)
-  - Local Data Source (WatermelonDB operations)
+### Data Layer (Data Management)
+- **Models**:
+  - `request/`: API request models
+  - `response/`: API response models  
+  - `database/`: WatermelonDB models
+  - `mappers/`: Convert giữa các model types
+- **DataSources**: 
+  - `interfaces/`: Interface definitions
+  - `implementations/`: Concrete implementations
+- **Services**:
+  - `interfaces/`: Service contracts (`IApiService`, `IDatabaseService`)
+  - `implementations/`: Service implementations (`ApiService`, `DatabaseService`)
 - **Repository Implementations**: Kết hợp remote và local data sources
 
-### Presentation Layer
+### Presentation Layer (UI & State)
 - **Screens**: UI screens (`UserListScreen`)
 - **Components**: Reusable UI components (`UserItem`, `UserForm`)
+- **Models**: View models cho UI display (`UserViewModel`)
 - **State Management**: Redux Toolkit với typed hooks
 
-### State Management Layer
-- **Redux Store**: Centralized state management
-- **Slices**: Redux Toolkit slices với async thunks
-- **Typed Hooks**: Type-safe Redux hooks (`useAppDispatch`, `useAppSelector`)
-
 ### Dependency Injection
-- **Container**: Inversify container để manage dependencies
+- **Container**: Inversify container với phân tách rõ ràng dependencies
 - **Types**: Symbol definitions cho DI
 
 ## 📁 Project Structure
 
 ```
 src/
-├── core/
+├── core/                                    # Business Logic Layer
 │   ├── entities/
-│   │   └── User.ts
+│   │   ├── User.ts                         # Domain entities
+│   │   └── Cart.ts
 │   ├── repositories/
-│   │   └── IUserRepository.ts
+│   │   └── IUserRepository.ts              # Repository contracts
 │   └── usecases/
-│       └── user/
-│           ├── IGetUsersUseCase.ts
+│       ├── base/
+│       │   └── IBaseUseCase.ts             # Simplified UseCase interface
+│       └── user/                           # User-specific use cases
 │           ├── GetUsersUseCase.ts
-│           ├── ICreateUserUseCase.ts
 │           ├── CreateUserUseCase.ts
-│           ├── IUpdateUserUseCase.ts
+│           ├── UpdateUserUseCase.ts
+│           └── DeleteUserUseCase.ts
+├── data/                                   # Data Management Layer
+│   ├── models/
+│   │   ├── request/                        # API Request models
+│   │   │   └── UserRequest.ts
+│   │   ├── response/                       # API Response models
+│   │   │   └── UserResponse.ts
+│   │   ├── database/                       # Database models
+│   │   │   ├── UserModel.ts
+│   │   │   └── schema.ts
+│   │   └── mappers/                        # Model converters
+│   │       └── UserMapper.ts
+│   ├── datasources/
+│   │   ├── interfaces/                     # DataSource contracts
+│   │   │   ├── IUserRemoteDataSource.ts
+│   │   │   └── IUserLocalDataSource.ts
+│   │   └── implementations/                # DataSource implementations
+│   │       ├── UserRemoteDataSource.ts
+│   │       └── UserLocalDataSource.ts
+│   ├── services/
+│   │   ├── interfaces/                     # Service contracts
+│   │   │   ├── IApiService.ts
+│   │   │   └── IDatabaseService.ts
+│   │   └── implementations/                # Service implementations
+│   │       ├── ApiService.ts
+│   │       └── DatabaseService.ts
+│   └── repositories/
+│       └── UserRepository.ts               # Repository implementations
+├── presentation/                           # UI & State Layer
+│   ├── components/
+│   │   ├── UserItem.tsx                    # Reusable components
+│   │   └── UserForm.tsx
+│   ├── screens/
+│   │   └── UserListScreen.tsx              # Screen components
+│   └── models/
+│       └── UserViewModel.ts                # View models for UI
+├── store/                                  # State Management
+│   ├── index.ts                           # Redux store configuration
+│   ├── hooks.ts                           # Typed Redux hooks
+│   └── slices/
+│       └── usersSlice.ts                  # Redux Toolkit slices
+├── di/                                     # Dependency Injection
+│   ├── container.ts                       # Inversify container
+│   └── types.ts                           # DI symbols
+└── utils/
+    ├── errorHandler.ts                    # Error handling utilities
+    └── CircuitBreaker.ts                  # Circuit breaker pattern
 │           ├── UpdateUserUseCase.ts
 │           ├── IDeleteUserUseCase.ts
 │           └── DeleteUserUseCase.ts
@@ -90,52 +141,62 @@ src/
 
 ## 🚀 Key Features
 
-### 1. Clean Architecture
-- Separation of concerns
-- Dependency inversion
-- Testable code structure
-- Independent of frameworks and UI
+### 1. Clean Architecture + Package Structure
+- **Separation of concerns**: Mỗi layer có trách nhiệm riêng biệt
+- **Dependency inversion**: Phụ thuộc vào interface, không phụ thuộc vào implementation
+- **Package separation**: Interface và implementation được tách riêng rõ ràng
+- **Testable code**: Dễ dàng mock và test từng component
+- **Independent**: Không phụ thuộc vào frameworks và UI cụ thể
 
-### 2. WatermelonDB
-- Offline-first local database
-- Reactive database queries
-- Optimistic updates
-- Sync capabilities với remote API
+### 2. Model Layer Architecture
+- **Request Models**: Structured data cho API requests
+- **Response Models**: Typed responses từ API
+- **Database Models**: WatermelonDB entities
+- **Domain Entities**: Business logic objects
+- **View Models**: UI-optimized data với formatting logic
+- **Mappers**: Convert data giữa các layers
 
-### 3. Dependency Injection
-- Sử dụng Inversify container
-- Loose coupling between components
-- Easy testing và mocking
-- Configurable dependencies
+### 3. WatermelonDB Integration
+- **Offline-first**: Local database với WatermelonDB
+- **Reactive queries**: Real-time UI updates
+- **Optimistic updates**: Instant UI feedback
+- **Sync capabilities**: Tự động sync với remote API
 
-### 4. RESTful API Integration
-- Axios HTTP client
-- Request/Response interceptors
-- Error handling
-- Automatic retry logic
+### 4. Dependency Injection với Inversify
+- **Container-based**: Manage dependencies centrally
+- **Interface-based**: Loose coupling between components
+- **Type-safe**: Full TypeScript support
+- **Testable**: Easy mocking cho unit tests
 
-### 5. Redux Toolkit State Management
+### 5. RESTful API Integration
+- **Axios HTTP client**: Robust API communication
+- **Interceptors**: Request/Response processing
+- **Error handling**: Comprehensive error management
+- **Circuit breaker**: Automatic retry logic
+
+### 6. Redux Toolkit State Management
 - **Centralized State**: Single source of truth
-- **Predictable Updates**: Immutable state updates
-- **Async Thunks**: Handle async operations
+- **Predictable Updates**: Immutable state updates với Immer
+- **Async Thunks**: Handle async operations elegantly
 - **Type Safety**: Full TypeScript support
 - **DevTools**: Redux DevTools integration
 
-### 6. Modular Design
-- Feature-based modules
-- Reusable components
-- Scalable architecture
+### 7. Simplified UseCase Pattern
+- **Single Interface**: `IUseCase<TInput, TOutput>`
+- **Inline Validation**: No complex base classes
+- **Easy to Implement**: Straightforward business logic
+- **Type-Safe**: Strong typing for inputs and outputs
 
 ## 🛠️ Technologies Used
 
-- **React Native**: Mobile framework
-- **TypeScript**: Type safety
-- **Redux Toolkit**: State management
+- **React Native**: Cross-platform mobile framework
+- **TypeScript**: Static type checking
+- **Redux Toolkit**: Modern Redux với less boilerplate
 - **React Redux**: React bindings for Redux
-- **WatermelonDB**: Local database
-- **Axios**: HTTP client
-- **Inversify**: Dependency injection
-- **React Hooks**: UI state management
+- **WatermelonDB**: High-performance local database
+- **Axios**: Promise-based HTTP client
+- **Inversify**: Lightweight dependency injection
+- **React Hooks**: Modern React patterns
 
 ## 📱 Features
 
@@ -198,87 +259,167 @@ npm start
 ```bash
 # Android
 npm run android
+# or using batch script
+./run-android.bat
 
 # iOS
 npm run ios
 ```
 
-## 🏗️ Architecture Layers
+## 🏗️ Architecture Layers Deep Dive
 
 ### 1. **Presentation Layer**
-- React Native components và screens
-- Redux store connection qua typed hooks
-- UI logic và user interactions
+- **Components**: Reusable UI components (`UserItem`, `UserForm`)
+- **Screens**: Screen components với navigation (`UserListScreen`)
+- **ViewModels**: UI-optimized data models với formatting logic
+- **Redux Integration**: Store connection qua typed hooks
 
-### 2. **State Management Layer** 
-- Redux Toolkit store
-- Slices với async thunks
-- Centralized state management
+### 2. **State Management Layer**
+- **Redux Store**: Centralized application state
+- **Slices**: Redux Toolkit slices với async thunks
+- **Typed Hooks**: Type-safe Redux hooks (`useAppDispatch`, `useAppSelector`)
+- **Middleware**: Redux middleware cho async operations
 
 ### 3. **Business Logic Layer**
-- Use Cases chứa business rules
+- **Use Cases**: Business rules với simplified `IUseCase<TInput, TOutput>`
+- **Entities**: Core business objects (`User`, `Cart`)
+- **Validation**: Inline validation logic trong use cases
 - Được gọi từ Redux async thunks
 - Independent từ UI và data sources
 
 ### 4. **Data Layer**
-- Repository pattern
-- Remote và Local data sources
-- WatermelonDB models
+- **Repository Pattern**: Abstract data access layer
+- **DataSources**: Remote (API) và Local (WatermelonDB) data sources
+- **Models**: Separated request, response, database, và domain models
+- **Mappers**: Convert data between different model types
 
-### 5. **Dependency Injection Layer**
-- Inversify container
-- Interface-based dependencies
-- Loose coupling between layers
+### 5. **Service Layer**
+- **API Service**: HTTP client với interceptors
+- **Database Service**: WatermelonDB management
+- **Error Handling**: Centralized error management
+- **Circuit Breaker**: Automatic retry và fallback logic
 
-## 🧪 Testing
+### 6. **Dependency Injection Layer**
+- **Inversify Container**: Manage dependencies centrally
+- **Interface-based**: Loose coupling between layers
+- **Type-safe**: Full TypeScript support
 
-Với Clean Architecture và Redux, việc testing trở nên dễ dàng:
+## 🏛️ Package Structure Benefits
 
-- **Unit Tests**: Test các Use Cases và business logic
-- **Redux Tests**: Test reducers, actions, và async thunks
-- **Integration Tests**: Test Repository implementations
-- **UI Tests**: Test React components với Redux state
+### **Interface/Implementation Separation**
+```typescript
+// Clear separation allows easy extension
+src/data/services/
+├── interfaces/
+│   ├── IApiService.ts        // Contract
+│   └── IDatabaseService.ts   // Contract
+└── implementations/
+    ├── ApiService.ts         // Implementation
+    └── DatabaseService.ts    // Implementation
+```
 
-## 🔄 Data Synchronization
+### **Model Layer Architecture**
+```typescript
+// Data flows through different model types
+API Response → Response Model → Domain Entity → View Model → UI
+API Request  ← Request Model  ← Domain Entity ← View Model ← UI
+Database     ← Database Model ← Domain Entity (via Mapper)
+```
 
-App implement offline-first approach:
+### **Mapper Pattern Benefits**
+- **Centralized Conversion**: All data transformation logic in one place
+- **Type Safety**: Compile-time checking for data conversion
+- **Maintainable**: Easy to update when API/Database schema changes
+- **Testable**: Easy to test conversion logic
 
-1. **Local First**: Tất cả operations được thực hiện trên local database trước
+## 🧪 Testing Strategy
+
+Với Clean Architecture và package structure này, testing trở nên dễ dàng:
+
+### **Unit Tests**
+- **Use Cases**: Test business logic isolation
+- **Mappers**: Test data conversion logic
+- **Repository**: Test data access patterns
+
+### **Integration Tests**
+- **DataSources**: Test API và database interactions
+- **Services**: Test service layer integration
+
+### **UI Tests**
+- **Components**: Test React components với mock data
+- **Redux**: Test store, reducers, actions, async thunks
+
+## 🔄 Data Flow Architecture
+
+```
+UI (Redux) → UseCase → Repository → DataSource → API/Database
+    ↓           ↓         ↓          ↓
+ ViewModel → Domain → Repository → Mapper → Response/Request Models
+```
+
+### **Offline-First Approach**
+1. **Local First**: All operations hit local database first
 2. **Background Sync**: Sync với remote API ở background
-3. **Conflict Resolution**: Handle conflicts khi sync
-4. **Retry Logic**: Automatic retry khi network có vấn đề
+3. **Conflict Resolution**: Handle conflicts khi sync data
+4. **Retry Logic**: Circuit breaker pattern cho network failures
 
-## 🎯 Best Practices
+## 🎯 SOLID Principles Implementation
 
-1. **Single Responsibility**: Mỗi class có một responsibility duy nhất
-2. **Interface Segregation**: Sử dụng interfaces để define contracts
-3. **Dependency Inversion**: Depend on abstractions, not concretions
-4. **Error Handling**: Proper error handling ở tất cả layers
-5. **Type Safety**: Sử dụng TypeScript cho type safety
+1. **Single Responsibility**: Mỗi class/interface có một responsibility
+2. **Open/Closed**: Easy to extend via interfaces, closed for modification
+3. **Liskov Substitution**: Implementations có thể substitute interfaces
+4. **Interface Segregation**: Small, focused interfaces
+5. **Dependency Inversion**: Depend on abstractions, not concretions
 
 ## 🚀 Future Enhancements
 
-- [ ] Authentication & Authorization
+- [ ] Authentication & Authorization layer
 - [ ] Real-time updates với WebSocket
 - [ ] Image upload functionality
-- [ ] Advanced search và filtering
-- [ ] Data validation với Yup
-- [ ] Unit tests với Jest
-- [ ] E2E tests với Detox
-- [ ] Performance monitoring
-- [ ] Redux Persist for offline state
-- [ ] Optimistic UI updates
-- [ ] Background sync với Redux Saga
+- [ ] Push notifications
+- [ ] Offline sync conflict resolution UI
+- [ ] Multi-language support
+- [ ] Dark mode theme
+## 📚 Additional Documentation
 
-## 📝 Notes
+Để hiểu rõ hơn về kiến trúc và implementation, tham khảo các tài liệu sau:
 
-- **State Management**: Sử dụng Redux Toolkit thay vì custom hooks
-- **API endpoint**: Hiện tại sử dụng JSONPlaceholder cho demo
-- **Production**: Cần cấu hình real API endpoint trong production
-- **Database**: WatermelonDB sẽ được tạo tự động khi app khởi động
-- **Dependencies**: Tất cả dependencies được inject qua DI container
-- **TypeScript**: Full type safety với Redux Toolkit và TypeScript
-- **DevTools**: Redux DevTools được enable trong development mode
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)**: Chi tiết về Clean Architecture implementation
+- **[FLOW_DOCUMENTATION.md](./FLOW_DOCUMENTATION.md)**: Luồng xử lý data và business logic
+- **[SIMPLIFIED_USECASE_ARCHITECTURE.md](./SIMPLIFIED_USECASE_ARCHITECTURE.md)**: UseCase pattern đơn giản hóa
+- **[ULTRA_SIMPLE_USECASE.md](./ULTRA_SIMPLE_USECASE.md)**: Hướng dẫn implement UseCase
+
+## 📝 Development Notes
+
+### **State Management**
+- Sử dụng Redux Toolkit thay vì custom hooks
+- Async operations được handle bằng createAsyncThunk
+- Type-safe với TypeScript và RTK Query potential
+
+### **Data Layer**
+- API endpoint: Hiện tại sử dụng JSONPlaceholder cho demo
+- Database: WatermelonDB tự động tạo khi app khởi động
+- Mappers: Centralized data conversion logic
+
+### **Architecture**
+- Dependencies được inject qua Inversify container
+- Interface/Implementation separation cho tất cả services
+- Package structure optimized cho scalability
+
+### **Development Tools**
+- Redux DevTools enabled trong development mode
+- TypeScript strict mode cho type safety
+- ESLint và Prettier cho code quality
+
+### **Production Considerations**
+- Cần cấu hình real API endpoint
+- Environment variables cho different environments
+- Error tracking và monitoring
+- Performance optimization
+
+---
+
+**Built with ❤️ using Clean Architecture + Redux Toolkit**
 
 ## 🤝 Contributing
 

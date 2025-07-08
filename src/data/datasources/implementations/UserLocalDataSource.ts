@@ -1,9 +1,10 @@
 import { injectable, inject } from 'inversify';
-import type { IUserLocalDataSource } from './IUserLocalDataSource';
-import type { IDatabaseService } from './IDatabaseService';
-import { User } from '../../core/entities/User';
-import { UserModel } from '../models/UserModel';
-import { TYPES } from '../../di/types';
+import type { IUserLocalDataSource } from '../interfaces/IUserLocalDataSource';
+import type { IDatabaseService } from '../../services/interfaces/IDatabaseService';
+import { User } from '../../../core/entities/User';
+import { UserModel } from '../../models/database/UserModel';
+import { UserMapper } from '../../models/mappers/UserMapper';
+import { TYPES } from '../../../di/types';
 import { Q } from '@nozbe/watermelondb';
 
 @injectable()
@@ -15,14 +16,14 @@ export class UserLocalDataSource implements IUserLocalDataSource {
   async getUsers(): Promise<User[]> {
     const database = this.databaseService.getDatabase();
     const userModels = await database.get<UserModel>('users').query().fetch();
-    return userModels.map(this.mapModelToUser);
+    return UserMapper.fromDatabaseModelArray(userModels);
   }
 
   async getUserById(id: string): Promise<User | null> {
     try {
       const database = this.databaseService.getDatabase();
       const userModel = await database.get<UserModel>('users').find(id);
-      return this.mapModelToUser(userModel);
+      return UserMapper.fromDatabaseModel(userModel);
     } catch (error) {
       return null;
     }
@@ -43,7 +44,7 @@ export class UserLocalDataSource implements IUserLocalDataSource {
       });
     });
 
-    return this.mapModelToUser(newUser);
+    return UserMapper.fromDatabaseModel(newUser);
   }
 
   async updateUser(id: string, userData: Partial<User>): Promise<User> {
@@ -61,7 +62,7 @@ export class UserLocalDataSource implements IUserLocalDataSource {
       });
     });
 
-    return this.mapModelToUser(updatedUser);
+    return UserMapper.fromDatabaseModel(updatedUser);
   }
 
   async deleteUser(id: string): Promise<void> {
@@ -111,18 +112,5 @@ export class UserLocalDataSource implements IUserLocalDataSource {
         ...allUsers.map(user => user.prepareDestroyPermanently())
       );
     });
-  }
-
-  private mapModelToUser(userModel: UserModel): User {
-    return {
-      id: userModel.id,
-      name: userModel.name,
-      email: userModel.email,
-      phone: userModel.phone,
-      avatar: userModel.avatar,
-      isActive: userModel.isActive,
-      createdAt: userModel.createdAt,
-      updatedAt: userModel.updatedAt,
-    };
   }
 }

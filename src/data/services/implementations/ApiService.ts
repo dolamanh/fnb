@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { IApiService } from './IApiService';
-import { handleApiError, logError } from '../../utils/errorHandler';
+import { IApiService } from '../interfaces/IApiService';
+import { handleApiError, logError } from '../../../utils/errorHandler';
 
 @injectable()
 export class ApiService implements IApiService {
@@ -9,10 +9,12 @@ export class ApiService implements IApiService {
 
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: 'https://jsonplaceholder.typicode.com', // Example API
+      baseURL: 'ttps://fnb-dev.mysapo.vn/admin', // Example API
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
+        'X-Device-Id': 'fe3eff481b8edaf3',
+        'X-Fnb-Token': 'e3533728c17144b1a5463866c593dab3'
       },
     });
 

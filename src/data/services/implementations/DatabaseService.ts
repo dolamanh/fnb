@@ -1,9 +1,9 @@
 import { injectable } from 'inversify';
 import { Database } from '@nozbe/watermelondb';
 import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite';
-import { IDatabaseService } from './IDatabaseService';
-import schema from '../models/schema';
-import { UserModel } from '../models/UserModel';
+import { IDatabaseService } from '../interfaces/IDatabaseService';
+import schema from '../../models/database/schema';
+import { UserModel } from '../../models/database/UserModel';
 
 @injectable()
 export class DatabaseService implements IDatabaseService {

@@ -33,11 +33,6 @@ function App() {
   return (
     <Provider store={store}>
       <SafeAreaView style={styles.container}>
-        <StatusBar 
-          barStyle="dark-content" 
-          backgroundColor="#f5f5f5" 
-          translucent={false}
-        />
         <UserListScreen />
       </SafeAreaView>
     </Provider>
@@ -48,7 +43,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
 });
 

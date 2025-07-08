@@ -1,17 +1,11 @@
 import { injectable, inject } from 'inversify';
-import type { IUserRemoteDataSource } from './IUserRemoteDataSource';
-import type { IApiService } from './IApiService';
-import { User } from '../../core/entities/User';
-import { TYPES } from '../../di/types';
-import { handleApiError, logError } from '../../utils/errorHandler';
-
-interface UserApiResponse {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  website?: string;
-}
+import type { IUserRemoteDataSource } from '../interfaces/IUserRemoteDataSource';
+import type { IApiService } from '../../services/interfaces/IApiService';
+import { User } from '../../../core/entities/User';
+import { UserApiResponse } from '../../models/response/UserResponse';
+import { UserMapper } from '../../models/mappers/UserMapper';
+import { TYPES } from '../../../di/types';
+import { handleApiError, logError } from '../../../utils/errorHandler';
 
 @injectable()
 export class UserRemoteDataSource implements IUserRemoteDataSource {
@@ -22,7 +16,7 @@ export class UserRemoteDataSource implements IUserRemoteDataSource {
   async getUsers(): Promise<User[]> {
     try {
       const response = await this.apiService.get<UserApiResponse[]>('/users');
-      return response.data.map(this.mapApiResponseToUser);
+      return UserMapper.fromApiResponseArray(response.data);
     } catch (error) {
       const apiError = handleApiError(error);
       logError(apiError, 'UserRemoteDataSource.getUsers');
@@ -33,7 +27,7 @@ export class UserRemoteDataSource implements IUserRemoteDataSource {
   async getUserById(id: string): Promise<User | null> {
     try {
       const response = await this.apiService.get<UserApiResponse>(`/users/${id}`);
-      return this.mapApiResponseToUser(response.data);
+      return UserMapper.fromApiResponse(response.data);
     } catch (error) {
       const apiError = handleApiError(error);
       logError(apiError, `UserRemoteDataSource.getUserById(${id})`);
@@ -50,7 +44,7 @@ export class UserRemoteDataSource implements IUserRemoteDataSource {
       };
       
       const response = await this.apiService.post<UserApiResponse>('/users', apiData);
-      return this.mapApiResponseToUser(response.data);
+      return UserMapper.fromApiResponse(response.data);
     } catch (error) {
       const apiError = handleApiError(error);
       logError(apiError, 'UserRemoteDataSource.createUser');
@@ -67,7 +61,7 @@ export class UserRemoteDataSource implements IUserRemoteDataSource {
       };
       
       const response = await this.apiService.put<UserApiResponse>(`/users/${id}`, apiData);
-      return this.mapApiResponseToUser(response.data);
+      return UserMapper.fromApiResponse(response.data);
     } catch (error) {
       const apiError = handleApiError(error);
       logError(apiError, `UserRemoteDataSource.updateUser(${id})`);
@@ -82,28 +76,6 @@ export class UserRemoteDataSource implements IUserRemoteDataSource {
       const apiError = handleApiError(error);
       logError(apiError, `UserRemoteDataSource.deleteUser(${id})`);
       throw apiError;
-    }
-  }
-
-  private mapApiResponseToUser(apiUser: UserApiResponse): User {
-    try {
-      if (!apiUser || !apiUser.id || !apiUser.name || !apiUser.email) {
-        throw new Error('Invalid user data from API');
-      }
-      
-      return {
-        id: apiUser.id.toString(),
-        name: apiUser.name,
-        email: apiUser.email,
-        phone: apiUser.phone || '',
-        avatar: undefined,
-        isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-    } catch (error) {
-      logError(error as Error, 'UserRemoteDataSource.mapApiResponseToUser');
-      throw error;
     }
   }
 }

@@ -1,7 +1,7 @@
 import { injectable, inject } from 'inversify';
 import type { IUserRepository } from '../../core/repositories/IUserRepository';
-import type { IUserRemoteDataSource } from '../datasources/IUserRemoteDataSource';
-import type { IUserLocalDataSource } from '../datasources/IUserLocalDataSource';
+import type { IUserRemoteDataSource } from '../datasources/interfaces/IUserRemoteDataSource';
+import type { IUserLocalDataSource } from '../datasources/interfaces/IUserLocalDataSource';
 import { User } from '../../core/entities/User';
 import { TYPES } from '../../di/types';
 
@@ -76,7 +76,7 @@ export class UserRepository implements IUserRepository {
 
   async syncUsers(): Promise<void> {
     try {
-      // const remoteUsers = await this.remoteDataSource.getUsers();
+      const remoteUsers = await this.remoteDataSource.getUsers();
       // Clear existing users first
       await this.localDataSource.clearUsers();
       // Save new users from remote
