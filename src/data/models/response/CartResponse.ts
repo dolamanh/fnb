@@ -1,0 +1,141 @@
+// API Response Models for Cart operations
+
+export interface CartApiResponse {
+  client_id: string;
+  customer_id: string;
+  name: string;
+  customer_count: number;
+  cashier_name: string;
+  user_id: string;
+  note: string;
+  device_id: string;
+  dine_type: string;
+  shipping_method_type?: string;
+  partner_order_id?: string;
+  status: string;
+  created_on: number;
+  modified_on?: number;
+  total_item_price: number;
+  total_discount: number;
+  total_price: number;
+  client_time: number;
+  print: boolean;
+  print_stamp: boolean;
+  print_check_sheet: boolean;
+  print_time: number;
+  reference: string;
+  deleted: boolean;
+  include_tax_to_bill: boolean;
+  items: CartItemApiResponse[];
+  table?: TableApiResponse;
+  discounts: DiscountApiResponse[];
+  discounts_not_use: string[];
+  service_fees: ServiceFeeApiResponse[];
+  taxes: TaxApiResponse[];
+  cancelled?: boolean;
+  shipment?: any;
+  combos: ComboApiResponse[];
+  table_booking?: any;
+  print_stamp_time: number;
+  print_check_sheet_time: number;
+  printed: boolean;
+  versions?: any;
+  last_version: string;
+  vibrate_card_number?: string;
+  cart_type?: string;
+  cart_approve: boolean;
+  customer_info?: any;
+  payment_method_type?: string;
+  cart_version: number;
+  tables?: TableApiResponse[];
+}
+
+export interface CartItemApiResponse {
+  id: string;
+  cart_id: string;
+  product_id: string;
+  name: string;
+  quantity: number;
+  price: number;
+  discount: number;
+  total_price: number;
+  note: string;
+  created_on: number;
+  modified_on?: number;
+  deleted: boolean;
+}
+
+export interface TableApiResponse {
+  id: string;
+  name: string;
+  description?: string;
+  status: string;
+  created_on: number;
+  modified_on?: number;
+}
+
+export interface DiscountApiResponse {
+  id: string;
+  cart_id: string;
+  name: string;
+  type: string;
+  value: number;
+  created_on: number;
+  modified_on?: number;
+  deleted: boolean;
+}
+
+export interface ServiceFeeApiResponse {
+  id: string;
+  cart_id: string;
+  name: string;
+  type: string;
+  value: number;
+  created_on: number;
+  modified_on?: number;
+  deleted: boolean;
+}
+
+export interface TaxApiResponse {
+  id: string;
+  cart_id: string;
+  name: string;
+  type: string;
+  value: number;
+  created_on: number;
+  modified_on?: number;
+  deleted: boolean;
+}
+
+export interface ComboApiResponse {
+  id: string;
+  cart_id: string;
+  name: string;
+  product_ids: string[];
+  quantity: number;
+  price: number;
+  discount: number;
+  total_price: number;
+  created_on: number;
+  modified_on?: number;
+  deleted: boolean;
+}
+
+export interface CartsApiResponse {
+  data: CartApiResponse[];
+  meta?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export interface CreateCartApiResponse extends CartApiResponse {}
+
+export interface UpdateCartApiResponse extends CartApiResponse {}
+
+export interface DeleteCartApiResponse {
+  success: boolean;
+  message?: string;
+}
