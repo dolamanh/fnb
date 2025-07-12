@@ -1,6 +1,6 @@
 import { container } from '../di/container';
 import { TYPES } from '../di/types';
-import type { IUserLocalDataSource } from '../data/datasources/IUserLocalDataSource';
+import type { IUserLocalDataSource } from '../core/ports/datasources/IUserLocalDataSource';
 
 export function testDI() {
   try {

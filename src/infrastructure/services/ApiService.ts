@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { IApiService } from '../interfaces/IApiService';
-import { handleApiError, logError } from '../../../utils/errorHandler';
+import { IApiService } from '../../core/ports/services/IApiService';
+import { handleApiError, logError } from '../../utils/errorHandler';
 
 @injectable()
 export class ApiService implements IApiService {

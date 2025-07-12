@@ -9,7 +9,7 @@ import { Provider } from 'react-redux';
 import { store } from './src/store';
 import { container } from './src/di/container';
 import { TYPES } from './src/di/types';
-import { IDatabaseService } from './src/data/datasources/IDatabaseService';
+import { IDatabaseService } from './src/core/ports/services/IDatabaseService';
 import { UserListScreen } from './src/presentation/screens/UserListScreen';
 
 function App() {

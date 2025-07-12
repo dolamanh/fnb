@@ -1,10 +1,10 @@
 import { injectable, inject } from 'inversify';
-import type { IUserLocalDataSource } from '../interfaces/IUserLocalDataSource';
-import type { IDatabaseService } from '../../services/interfaces/IDatabaseService';
-import { User } from '../../../core/entities/User';
-import { UserModel } from '../../models/database/UserModel';
-import { UserMapper } from '../../models/mappers/UserMapper';
-import { TYPES } from '../../../di/types';
+import type { IUserLocalDataSource } from '../../core/ports/datasources/IUserLocalDataSource';
+import type { IDatabaseService } from '../../core/ports/services/IDatabaseService';
+import { User } from '../../core/entities/User';
+import { UserModel } from '../database/UserModel';
+import { UserMapper } from '../api/mappers/UserMapper';
+import { TYPES } from '../../di/types';
 import { Q } from '@nozbe/watermelondb';
 
 @injectable()

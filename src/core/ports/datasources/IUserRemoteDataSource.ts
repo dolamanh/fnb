@@ -1,4 +1,4 @@
-import { User } from '../../../core/entities/User';
+import { User } from '../../entities/User';
 
 export interface IUserRemoteDataSource {
   getUsers(): Promise<User[]>;

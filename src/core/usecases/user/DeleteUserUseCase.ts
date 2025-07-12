@@ -1,7 +1,7 @@
 import { injectable, inject } from 'inversify';
-import { IUseCase } from '../base/IBaseUseCase';
-import type { IUserRepository } from '../../repositories/IUserRepository';
+import type { IUserRepository } from '../../ports/repositories/IUserRepository';
 import { TYPES } from '../../../di/types';
+import { IUseCase } from '../base/IBaseUseCase';
 
 // Simple types inline
 type DeleteUserInput = string; // User ID

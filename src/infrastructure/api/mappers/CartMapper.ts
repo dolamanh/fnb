@@ -9,8 +9,8 @@ import {
   ServiceFeeApiResponse,
   TaxApiResponse,
   ComboApiResponse
-} from '../response/CartResponse';
-import { CartModel, CartItemModel, TableModel } from '../database/CartModel';
+} from '../dtos/CartResponse';
+import { CartModel, CartItemModel, TableModel } from '../../database/CartModel';
 import { 
   CartViewModel, 
   CartItemViewModel, 

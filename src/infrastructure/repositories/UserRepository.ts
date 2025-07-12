@@ -1,7 +1,7 @@
 import { injectable, inject } from 'inversify';
-import type { IUserRepository } from '../../core/repositories/IUserRepository';
-import type { IUserRemoteDataSource } from '../datasources/interfaces/IUserRemoteDataSource';
-import type { IUserLocalDataSource } from '../datasources/interfaces/IUserLocalDataSource';
+import type { IUserRepository } from '../../core/ports/repositories/IUserRepository';
+import type { IUserRemoteDataSource } from '../../core/ports/datasources/IUserRemoteDataSource';
+import type { IUserLocalDataSource } from '../../core/ports/datasources/IUserLocalDataSource';
 import { User } from '../../core/entities/User';
 import { TYPES } from '../../di/types';
 

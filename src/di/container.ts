@@ -2,21 +2,25 @@ import 'reflect-metadata';
 import { Container } from 'inversify';
 import { TYPES } from './types';
 
-// Direct imports with types
-import { ApiService } from '../data/services/implementations/ApiService';
-import { DatabaseService } from '../data/services/implementations/DatabaseService';
-import { UserRemoteDataSource } from '../data/datasources/implementations/UserRemoteDataSource';
-import { UserLocalDataSource } from '../data/datasources/implementations/UserLocalDataSource';
-import { UserRepository } from '../data/repositories/UserRepository';
+// Infrastructure implementations
+import { ApiService } from '../infrastructure/services/ApiService';
+import { DatabaseService } from '../infrastructure/services/DatabaseService';
+import { UserRemoteDataSource } from '../infrastructure/datasources/UserRemoteDataSource';
+import { UserLocalDataSource } from '../infrastructure/datasources/UserLocalDataSource';
+import { UserRepository } from '../infrastructure/repositories/UserRepository';
+
+// Core ports
+import type { IApiService } from '../core/ports/services/IApiService';
+import type { IDatabaseService } from '../core/ports/services/IDatabaseService';
+import type { IUserLocalDataSource } from '../core/ports/datasources/IUserLocalDataSource';
+import type { IUserRemoteDataSource } from '../core/ports/datasources/IUserRemoteDataSource';
+import type { IUserRepository } from '../core/ports/repositories/IUserRepository';
+
+// UseCases
 import { GetUsersUseCase } from '../core/usecases/user/GetUsersUseCase';
 import { CreateUserUseCase } from '../core/usecases/user/CreateUserUseCase';
 import { UpdateUserUseCase } from '../core/usecases/user/UpdateUserUseCase';
 import { DeleteUserUseCase } from '../core/usecases/user/DeleteUserUseCase';
-import type { IApiService } from '../data/services/interfaces/IApiService';
-import type { IDatabaseService } from '../data/services/interfaces/IDatabaseService';
-import type { IUserLocalDataSource } from '../data/datasources/interfaces/IUserLocalDataSource';
-import type { IUserRemoteDataSource } from '../data/datasources/interfaces/IUserRemoteDataSource';
-import type { IUserRepository } from '../core/repositories/IUserRepository';
 
 const container = new Container();
 
