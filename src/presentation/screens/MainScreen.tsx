@@ -8,9 +8,9 @@ import {
     ActivityIndicator,
     Alert,
 } from 'react-native';
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { getCarts } from '../../store/slices/cartsSlice';
-import { Cart } from '../../core/entities/Cart';
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { getCarts } from '../store/slices/cartsSlice';
+import { Cart } from '../../core/entities/cart/Cart';
 
 export const MainScreen: React.FC = () => {
     const state = useAppSelector((state) => state);

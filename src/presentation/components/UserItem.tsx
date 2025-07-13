@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { User } from '../../core/entities/User';
+import { User } from '../../core/entities/user/User';
 
 interface UserItemProps {
   user: User;

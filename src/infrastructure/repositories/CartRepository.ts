@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
-import type { ICartRemoteDataSource } from "../../core/ports/datasources/ICartRemoteDataSource";
+import type { ICartRemoteDataSource } from "../../core/ports/datasources/remote/ICartRemoteDataSource";
 import { TYPES } from "../../di/types";
-import { Cart } from "../../core/entities/Cart";
+import { Cart } from "../../core/entities/cart/Cart";
 import { CartMapper } from "../api/mappers/CartMapper";
 import { ICartRepository } from "../../core/ports/repositories/ICartRepository";
 

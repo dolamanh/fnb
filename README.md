@@ -1,387 +1,179 @@
-# FnB - React Native App với Clean Architecture + Redux Toolkit
+# 🍽️ FnB App - Food & Beverage Management
 
-Ứng dụng React Native được xây dựng theo nguyên tắc Clean Architecture chuẩn Uncle Bob, với WatermelonDB, Dependency Injection, Redux Toolkit và Axios cho RESTful API.
+**Clean Architecture React Native App with TypeScript, Redux Toolkit & WatermelonDB**
 
-## 🏗️ Clean Architecture Overview
+[![React Native](https://img.shields.io/badge/React%20Native-v0.80-blue.svg)](https://reactnative.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-v5.x-blue.svg)](https://www.typescriptlang.org/)
+[![Redux Toolkit](https://img.shields.io/badge/Redux%20Toolkit-v2.x-purple.svg)](https://redux-toolkit.js.org/)
+[![WatermelonDB](https://img.shields.io/badge/WatermelonDB-v0.27-green.svg)](https://nozbe.github.io/WatermelonDB/)
 
-Dự án này tuân thủ nghiêm ngặt nguyên tắc Clean Architecture với **Dependency Rule**: các layer bên trong không được phụ thuộc vào layer bên ngoài.
+## 📋 Tổng quan
 
-### 🎯 Core Layer (Business Logic) - Innermost
-**Độc lập hoàn toàn, không phụ thuộc framework hay database**
-- **Entities**: Business objects thuần túy (`User`, `Cart`)
-- **Use Cases**: Business logic với interface đơn giản `IUseCase<TInput, TOutput>`
-- **Ports**: Interface contracts cho external dependencies
-  - `repositories/`: Repository interfaces
-  - `services/`: Service interfaces (`IApiService`, `IDatabaseService`)
-  - `datasources/`: DataSource interfaces
+FnB App là ứng dụng quản lý Food & Beverage được xây dựng theo **Clean Architecture** với các công nghệ hiện đại:
 
-### 🔧 Infrastructure Layer (Data & External Concerns)
-**Implements ports của Core layer, chứa framework-specific code**
-- **API**: External service communication
-  - `dtos/`: Data Transfer Objects (Request/Response models)
-  - `mappers/`: Convert giữa DTOs và Domain Entities
-- **Database**: Data persistence với WatermelonDB
-  - `models/`: Database schema models
-  - `mappers/`: Convert giữa DB models và Domain Entities
-- **Repositories**: Orchestrate remote + local data sources
-- **Services**: External service implementations
-- **DataSources**: Data access implementations (remote API, local DB)
+- **🏗️ Clean Architecture** - Tách biệt rõ ràng các layer và dependency direction
+- **⚛️ React Native** - Cross-platform mobile development
+- **🔷 TypeScript** - Type safety và developer experience tốt hơn
+- **🔄 Redux Toolkit** - State management predictable và hiệu quả
+- **💾 WatermelonDB** - Offline-first database với sync capabilities
+- **🔌 InversifyJS** - Dependency Injection container
+- **🧪 Jest** - Unit testing framework
 
-### 🎨 Presentation Layer (UI & State) - Outermost
-**React Native UI components và state management**
-- **Screens**: UI screens (`UserListScreen`)
-- **Components**: Reusable UI components (`UserItem`, `UserForm`)
-- **Models**: View models cho UI display (`UserViewModel`)
-- **Mappers**: Convert Domain Entities sang View Models
-- **State Management**: Redux Toolkit với typed hooks
-
-### 🔌 Dependency Injection
-**Inversify container quản lý dependencies và tuân thủ Dependency Rule**
-- **Container**: DI container setup
-- **Types**: Symbol definitions cho DI
-
-## 📁 Project Structure
+## 🏗️ Kiến trúc Clean Architecture
 
 ```
 src/
-├── core/                                    # 🎯 CORE LAYER (Business Logic)
-│   ├── entities/                           # Domain entities (thuần túy, không phụ thuộc)
-│   │   ├── User.ts                         # User business object
-│   │   └── Cart.ts                         # Cart business object
-│   ├── ports/                              # Interface contracts (Dependency Inversion)
-│   │   ├── repositories/
-│   │   │   └── IUserRepository.ts          # Repository interface
-│   │   ├── services/
-│   │   │   ├── IApiService.ts              # API service interface
-│   │   │   └── IDatabaseService.ts         # Database service interface
-│   │   └── datasources/
-│   │       ├── IUserRemoteDataSource.ts    # Remote data source interface
-│   │       └── IUserLocalDataSource.ts     # Local data source interface
-│   └── usecases/                           # Business logic use cases
-│       ├── base/
-│       │   └── IBaseUseCase.ts             # Base UseCase interface
-│       └── user/
-│           ├── GetUsersUseCase.ts          # Get all users
-│           ├── CreateUserUseCase.ts        # Create new user
-│           ├── UpdateUserUseCase.ts        # Update existing user
-│           └── DeleteUserUseCase.ts        # Delete user
+├── 🧠 core/                    # Domain Layer
+│   ├── entities/              # Business entities (User, Cart)
+│   ├── errors/                # Domain errors (ValidationError, BusinessRuleError)
+│   ├── ports/                 # Interfaces (repositories, services, datasources)
+│   └── usecases/              # Business logic (GetUsers, CreateUser, etc.)
 │
-├── infrastructure/                         # 🔧 INFRASTRUCTURE LAYER (Framework & External)
-│   ├── api/                                # External API communication
-│   │   ├── dtos/                           # Data Transfer Objects
-│   │   │   ├── UserResponse.ts             # API response models
-│   │   │   └── CartResponse.ts
-│   │   └── mappers/                        # API ↔ Domain conversion
-│   │       ├── UserMapper.ts               # User API/DB/View mappers
-│   │       └── CartMapper.ts               # Cart API/DB/View mappers
-│   ├── database/                           # Data persistence
-│   │   ├── schema.ts                       # WatermelonDB schema
-│   │   ├── UserModel.ts                    # Database table models
-│   │   └── CartModel.ts
-│   ├── repositories/                       # Repository implementations
-│   │   └── UserRepository.ts               # Implements IUserRepository
-│   ├── services/                           # Service implementations
-│   │   ├── ApiService.ts                   # HTTP client implementation
-│   │   └── DatabaseService.ts              # Database service implementation
-│   └── datasources/                        # Data source implementations
-│       ├── UserRemoteDataSource.ts         # API data source
-│       └── UserLocalDataSource.ts          # Local database data source
+├── 🔧 infrastructure/         # Framework Layer
+│   ├── api/                   # DTOs và mappers cho API
+│   ├── database/              # Database models và schema
+│   ├── datasources/           # Concrete implementations (remote/local)
+│   ├── errors/                # Infrastructure errors (ApiError, NetworkError)
+│   ├── patterns/              # Infrastructure patterns (CircuitBreaker)
+│   ├── repositories/          # Repository implementations
+│   └── services/              # Service implementations (API, Database)
 │
-├── presentation/                           # 🎨 PRESENTATION LAYER (UI & State)
-│   ├── screens/
-│   │   └── UserListScreen.tsx              # UI screens
-│   ├── components/
-│   │   ├── UserItem.tsx                    # Reusable components
-│   │   └── UserForm.tsx
-│   ├── models/                             # View models for UI
-│   │   ├── UserViewModel.ts                # User display model
-│   │   └── CartViewModel.ts                # Cart display model
-│   └── mappers/
-│       └── UserViewMapper.ts               # Domain ↔ View conversion
+├── 🎨 presentation/           # UI Layer
+│   ├── components/            # Reusable React components
+│   ├── mappers/               # View mappers (Domain → ViewModel)
+│   ├── models/                # ViewModels cho UI
+│   ├── screens/               # Screen components
+│   └── store/                 # Redux store, slices, hooks
 │
-├── store/                                  # 🔄 STATE MANAGEMENT
-│   ├── index.ts                            # Redux store configuration
-│   ├── hooks.ts                            # Typed Redux hooks
-│   └── slices/
-│       └── usersSlice.ts                   # User state slice
+├── 🔌 di/                     # Dependency Injection
+│   ├── container.ts           # DI container configuration
+│   └── types.ts               # DI type symbols
 │
-├── di/                                     # 🔌 DEPENDENCY INJECTION
-│   ├── container.ts                        # Inversify DI container
-│   └── types.ts                            # DI symbols
-│
-└── utils/                                  # 🛠️ UTILITIES
-    ├── CircuitBreaker.ts                   # Resilience patterns
-    └── errorHandler.ts                     # Error handling
-```
-│       └── user/                           # User-specific use cases
-│           ├── GetUsersUseCase.ts
-│           ├── CreateUserUseCase.ts
-│           ├── UpdateUserUseCase.ts
-│           └── DeleteUserUseCase.ts
-├── data/                                   # Data Management Layer
-│   ├── models/
-│   │   ├── request/                        # API Request models
-│   │   │   └── UserRequest.ts
-│   │   ├── response/                       # API Response models
-│   │   │   └── UserResponse.ts
-│   │   ├── database/                       # Database models
-│   │   │   ├── UserModel.ts
-│   │   │   └── schema.ts
-│   │   └── mappers/                        # Model converters
-│   │       └── UserMapper.ts
-│   ├── datasources/
-│   │   ├── interfaces/                     # DataSource contracts
-│   │   │   ├── IUserRemoteDataSource.ts
-│   │   │   └── IUserLocalDataSource.ts
-│   │   └── implementations/                # DataSource implementations
-│   │       ├── UserRemoteDataSource.ts
-│   │       └── UserLocalDataSource.ts
-│   ├── services/
-│   │   ├── interfaces/                     # Service contracts
-│   │   │   ├── IApiService.ts
-│   │   │   └── IDatabaseService.ts
-│   │   └── implementations/                # Service implementations
-│   │       ├── ApiService.ts
-│   │       └── DatabaseService.ts
-│   └── repositories/
-│       └── UserRepository.ts               # Repository implementations
-├── presentation/                           # UI & State Layer
-│   ├── components/
-│   │   ├── UserItem.tsx                    # Reusable components
-│   │   └── UserForm.tsx
-│   ├── screens/
-│   │   └── UserListScreen.tsx              # Screen components
-│   └── models/
-│       └── UserViewModel.ts                # View models for UI
-├── store/                                  # State Management
-│   ├── index.ts                           # Redux store configuration
-│   ├── hooks.ts                           # Typed Redux hooks
-│   └── slices/
-│       └── usersSlice.ts                  # Redux Toolkit slices
-├── di/                                     # Dependency Injection
-│   ├── container.ts                       # Inversify container
-│   └── types.ts                           # DI symbols
-└── utils/
-    ├── errorHandler.ts                    # Error handling utilities
-    └── CircuitBreaker.ts                  # Circuit breaker pattern
-│           ├── UpdateUserUseCase.ts
-│           ├── IDeleteUserUseCase.ts
-│           └── DeleteUserUseCase.ts
-├── data/
-│   ├── models/
-│   │   ├── UserModel.ts
-│   │   └── schema.ts
-│   ├── datasources/
-│   │   ├── IApiService.ts
-│   │   ├── ApiService.ts
-│   │   ├── IDatabaseService.ts
-│   │   ├── DatabaseService.ts
-│   │   ├── IUserRemoteDataSource.ts
-│   │   ├── UserRemoteDataSource.ts
-│   │   ├── IUserLocalDataSource.ts
-│   │   └── UserLocalDataSource.ts
-│   └── repositories/
-│       └── UserRepository.ts
-├── presentation/
-│   ├── screens/
-│   │   └── UserListScreen.tsx
-│   └── components/
-│       ├── UserItem.tsx
-│       └── UserForm.tsx
-├── store/
-│   ├── index.ts
-│   ├── hooks.ts
-│   └── slices/
-│       └── usersSlice.ts
-├── di/
-│   ├── types.ts
-│   └── container.ts
-├── utils/
-│   ├── errorHandler.ts
-│   └── CircuitBreaker.ts
-├── debug/
-│   └── TestDI.ts
-└── index.ts
+└── 🐛 debug/                  # Debug utilities
+    └── TestDI.ts              # DI testing utilities
 ```
 
-## 🚀 Key Features
+## 🔄 Dependency Direction
 
-### 1. **Clean Architecture Compliance**
-- **Dependency Rule**: Core không phụ thuộc Infrastructure/Presentation
-- **Interface Segregation**: Ports/Adapters pattern với clear contracts
-- **Separation of Concerns**: Mỗi layer có trách nhiệm riêng biệt
-- **Framework Independence**: Business logic không phụ thuộc React Native
-- **Testable**: Dễ dàng unit test với dependency injection
-
-### 2. **Multi-Layer Mappers**
-- **API Mappers**: UserApiResponse ↔ User Entity
-- **Database Mappers**: UserModel ↔ User Entity  
-- **View Mappers**: User Entity ↔ UserViewModel
-- **Separation by Concern**: Mỗi mapper thuộc đúng layer của nó
-
-### 3. **Offline-First Architecture**
-- **WatermelonDB**: High-performance local database
-- **Cache Strategy**: Local-first, fallback to API
-- **Optimistic Updates**: Instant UI feedback
-- **Background Sync**: Auto-sync khi có network
-
-### 4. **Type-Safe Dependency Injection**
-- **Inversify Container**: Manage dependencies centrally
-- **Interface-based**: Loose coupling via interfaces
-- **Symbol Types**: Type-safe DI symbols
-- **Easy Testing**: Mock implementations for unit tests
-
-### 5. **Error Handling & Resilience**
-- **Circuit Breaker**: Automatic retry with backoff
-- **Global Error Handler**: Centralized error processing
-- **Graceful Degradation**: Fallback strategies for failures
-- **User-Friendly Messages**: Clear error communication
-
-### 6. **Redux Toolkit Integration**
-- **Async Thunks**: Handle side effects elegantly
-- **RTK Query Ready**: Scalable for API state management
-- **Typed Hooks**: useAppDispatch, useAppSelector
-- **DevTools**: Time-travel debugging support
-
-## 🛠️ Tech Stack
-
-**Frontend Framework**
-- **React Native**: Cross-platform mobile development
-- **TypeScript**: Static type checking và better developer experience
-
-**State Management**  
-- **Redux Toolkit**: Modern Redux với reduced boilerplate
-- **React Redux**: React bindings với typed hooks
-
-**Data Layer**
-- **WatermelonDB**: Reactive local database cho offline-first apps
-- **Axios**: HTTP client với interceptors và error handling
-
-**Architecture Patterns**
-- **Clean Architecture**: Uncle Bob's architecture principles
-- **Dependency Injection**: Inversify container cho IoC
-- **Repository Pattern**: Data access abstraction
-- **UseCase Pattern**: Business logic encapsulation
-
-**Development Tools**
-- **Metro Bundler**: React Native bundler
-- **React Native CLI**: Development và build tools
-- **TypeScript Compiler**: Type checking và compilation
-
-## 📱 App Features
-
-### 👥 User Management System
-- ✅ **Get All Users**: Fetch users từ API với local caching
-- ✅ **Create User**: Add new user với validation
-- ✅ **Update User**: Edit user information
-- ✅ **Delete User**: Remove user với confirmation
-- ✅ **Offline Support**: Full CRUD operations work offline
-- ✅ **Auto Sync**: Background synchronization với remote API
-- ✅ **Pull to Refresh**: Manual refresh functionality
-- ✅ **Error Handling**: Graceful error states và user feedback
-
-### 🔄 Data Synchronization
 ```
-📱 Local Database (WatermelonDB) ↔ 🌐 Remote API
-   ↓
-🔁 Bidirectional sync
-   ↓
-📊 Redux Store (UI State)
-   ↓  
-🎨 React Native UI
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Presentation  │───▶│      Core       │◄───│ Infrastructure  │
+│   (UI Layer)    │    │ (Business Logic)│    │ (Framework)     │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       ▲                       ▲
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 │
+                        ┌─────────────────┐
+                        │       DI        │
+                        │   Container     │
+                        └─────────────────┘
 ```
 
-### 🎯 Business Logic Flow
-```
-1. User interacts với UI component
-2. Component dispatches Redux action
-3. Async thunk calls appropriate UseCase via DI
-4. UseCase executes business logic
-5. Repository coordinates local/remote data sources
-6. Data flows back through mappers
-7. Redux state updates
-8. UI re-renders với new data
-```
+**Nguyên tắc:** Core không phụ thuộc vào bất kỳ layer nào. Infrastructure và Presentation đều phụ thuộc vào Core.
 
-## 🔧 Development Setup
+## 🚀 Bắt đầu
 
-### Prerequisites
+### Yêu cầu hệ thống
+
+- **Node.js** 18+ 
+- **React Native CLI** hoặc **Expo CLI**
+- **Android Studio** (cho Android development)
+- **Xcode** (cho iOS development - macOS only)
+- **Git**
+
+### Cài đặt
+
 ```bash
-# Node.js (≥16.x)
-node --version
-
-# React Native CLI
-npm install -g @react-native-community/cli
-
-# iOS (macOS only)
-# Install Xcode và Command Line Tools
-xcode-select --install
-
-# Android
-# Install Android Studio và set ANDROID_HOME
-```
-
-### Installation
-```bash
-# 1. Clone repository
-git clone <repository-url>
+# Clone repository
+git clone https://github.com/dolamanh/fnb.git
 cd fnb
 
-# 2. Install dependencies
+# Cài đặt dependencies
 npm install
 
-# 3. iOS setup (macOS only)
+# Cài đặt pods cho iOS (chỉ trên macOS)
 cd ios && pod install && cd ..
 
-# 4. Start Metro bundler
+# Khởi động Metro bundler
 npm start
 
-# 5. Run app
-# iOS
-npm run ios
-# Android  
-npm run android
-```
-
-### Development Commands
-```bash
-# Start development server
-npm start
-
-# Run on iOS simulator
-npm run ios
-
-# Run on Android emulator/device
+# Chạy trên Android
 npm run android
 
-# Type checking
-npx tsc --noEmit
-
-# Reset Metro cache
-npm start -- --reset-cache
-
-# Clean builds
-# iOS
-cd ios && xcodebuild clean && cd ..
-# Android
-cd android && ./gradlew clean && cd ..
+# Chạy trên iOS (chỉ trên macOS)
+npm run ios
 ```
 
-## 🧪 Testing Strategy
+### Build Commands
 
-### Unit Testing
 ```bash
-# Run all tests
+# Development build
+npm run build:dev
+
+# Production build
+npm run build:prod
+
+# Clean cache và rebuild
+npm run clean
+npx react-native start --reset-cache
+```
+
+## 📱 Tính năng
+
+### ✅ Đã triển khai
+
+- **👥 User Management**
+  - Xem danh sách users
+  - Tạo user mới
+  - Cập nhật thông tin user
+  - Xóa user
+  - Tìm kiếm và filter
+
+- **🛒 Cart Management**
+  - Xem danh sách carts
+  - Quản lý items trong cart
+  - Tính toán tổng giá trị
+
+- **💾 Offline Support**
+  - Local database với WatermelonDB
+  - Sync với remote API
+  - Hoạt động offline
+
+- **🔧 Technical Features**
+  - Type-safe Redux với RTK
+  - Dependency Injection với InversifyJS
+  - Error handling toàn diện
+  - Loading states và error states
+  - Pull-to-refresh
+  - Circuit breaker pattern
+
+### 🚧 Đang phát triển
+
+- **🔐 Authentication & Authorization**
+- **📊 Analytics Dashboard** 
+- **🔔 Push Notifications**
+- **🌐 Multi-language Support**
+- **🎨 Theme Customization**
+
+## 🧪 Testing
+
+```bash
+# Chạy unit tests
 npm test
 
-# Run với coverage
+# Chạy tests với coverage
 npm run test:coverage
 
-# Watch mode
+# Chạy tests ở watch mode
 npm run test:watch
+
+# Chạy E2E tests (nếu có)
+npm run test:e2e
 ```
 
 ### Test Structure
+
 ```
 __tests__/
 ├── core/
@@ -390,261 +182,422 @@ __tests__/
 │   └── ports/
 ├── infrastructure/
 │   ├── repositories/
-│   ├── services/
-│   └── datasources/
+│   ├── datasources/
+│   └── services/
 └── presentation/
     ├── components/
-    └── screens/
+    ├── screens/
+    └── store/
 ```
 
-### Testing Clean Architecture
-- **Core Layer**: Test business logic isolation
-- **Infrastructure**: Mock external dependencies
-- **Presentation**: Test UI components với mocked data
-- **Integration**: Test complete user flows
+## 🔧 Development
 
-## 🏗️ Adding New Features
+### VS Code Setup
 
-### 1. Create Domain Entity
-```typescript
-// src/core/entities/NewEntity.ts
-export interface NewEntity {
-  id: string;
-  name: string;
-  // ...other properties
+Khuyến nghị extensions:
+
+```json
+{
+  "recommendations": [
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-eslint",
+    "ms-vscode.vscode-jest",
+    "msjsdiag.vscode-react-native"
+  ]
 }
 ```
 
-### 2. Define Repository Interface
-```typescript
-// src/core/ports/repositories/INewEntityRepository.ts
-export interface INewEntityRepository {
-  getAll(): Promise<NewEntity[]>;
-  getById(id: string): Promise<NewEntity>;
-  create(entity: NewEntity): Promise<NewEntity>;
-  update(entity: NewEntity): Promise<NewEntity>;
-  delete(id: string): Promise<void>;
+### Debug Configuration
+
+File `.vscode/launch.json`:
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Android",
+      "type": "reactnative",
+      "request": "launch",
+      "platform": "android"
+    },
+    {
+      "name": "Debug iOS",
+      "type": "reactnative", 
+      "request": "launch",
+      "platform": "ios"
+    }
+  ]
 }
 ```
 
-### 3. Create Use Cases
+### Code Style
+
+Project sử dụng:
+- **ESLint** cho code linting
+- **Prettier** cho code formatting
+- **Husky** cho pre-commit hooks
+- **Conventional Commits** cho commit messages
+
+```bash
+# Lint code
+npm run lint
+
+# Fix lint issues
+npm run lint:fix
+
+# Format code
+npm run format
+```
+
+## 📊 State Management
+
+### Redux Store Structure
+
 ```typescript
-// src/core/usecases/newentity/GetNewEntitiesUseCase.ts
-export class GetNewEntitiesUseCase implements IUseCase<void, NewEntity[]> {
-  constructor(private repository: INewEntityRepository) {}
-  
-  async execute(): Promise<NewEntity[]> {
-    return await this.repository.getAll();
+RootState {
+  users: {
+    users: User[],
+    loading: boolean,
+    error: string | null
+  },
+  carts: {
+    carts: Cart[],
+    loading: boolean,
+    error: string | null
   }
 }
 ```
 
-### 4. Implement Infrastructure
+### Async Thunks
+
 ```typescript
-// src/infrastructure/repositories/NewEntityRepository.ts
-// src/infrastructure/datasources/NewEntityRemoteDataSource.ts
-// src/infrastructure/api/dtos/NewEntityResponse.ts
-// src/infrastructure/database/NewEntityModel.ts
+// Fetch users with error handling
+export const fetchUsers = createAsyncThunk(
+  'users/fetchUsers',
+  async (_, { rejectWithValue }) => {
+    try {
+      const getUsersUseCase = container.get<IGetUsersUseCase>(TYPES.GetUsersUseCase);
+      return await getUsersUseCase.execute();
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 ```
 
-### 5. Add to DI Container
+## 💾 Database Schema
+
+### WatermelonDB Models
+
 ```typescript
-// src/di/container.ts
-container.bind<INewEntityRepository>(TYPES.NewEntityRepository)
-  .to(NewEntityRepository);
+// User Model
+class UserModel extends Model {
+  static table = 'users';
+  
+  @text('name') name!: string;
+  @text('email') email!: string;
+  @text('phone') phone?: string;
+  @date('created_at') createdAt!: Date;
+  @date('updated_at') updatedAt!: Date;
+}
+
+// Cart Model  
+class CartModel extends Model {
+  static table = 'carts';
+  
+  @text('user_id') userId!: string;
+  @json('items', sanitizeCartItems) items!: CartItem[];
+  @field('total') total!: number;
+  @date('created_at') createdAt!: Date;
+}
 ```
 
-### 6. Create UI Components
+## 🔌 Dependency Injection
+
+### Container Configuration
+
 ```typescript
-// src/presentation/screens/NewEntityListScreen.tsx
-// src/presentation/models/NewEntityViewModel.ts
+// DI Types
+const TYPES = {
+  // Services
+  ApiService: Symbol.for('ApiService'),
+  DatabaseService: Symbol.for('DatabaseService'),
+  
+  // Repositories
+  UserRepository: Symbol.for('UserRepository'),
+  CartRepository: Symbol.for('CartRepository'),
+  
+  // Use Cases
+  GetUsersUseCase: Symbol.for('GetUsersUseCase'),
+  CreateUserUseCase: Symbol.for('CreateUserUseCase'),
+};
+
+// Container Binding
+container.bind(TYPES.UserRepository).toDynamicValue(() => {
+  const localDS = container.get<IUserLocalDataSource>(TYPES.UserLocalDataSource);
+  const remoteDS = container.get<IUserRemoteDataSource>(TYPES.UserRemoteDataSource);
+  return new UserRepository(localDS, remoteDS);
+});
 ```
 
-## 🚀 Production Deployment
+## 🛠️ API Integration
 
-### Build Configuration
+### External APIs
+
+- **JSONPlaceholder** - Mock REST API cho development
+- **Custom Backend** - Production API endpoints
+
+### API Service
+
+```typescript
+class ApiService implements IApiService {
+  private axios: AxiosInstance;
+  
+  async get<T>(url: string): Promise<T> {
+    try {
+      const response = await this.axios.get<T>(url);
+      return response.data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+  
+  private handleError(error: any): Error {
+    // Comprehensive error handling
+    return new ApiError(error.message, error.status);
+  }
+}
+```
+
+## 📁 File Structure Chi tiết
+
+```
+fnb/
+├── 📱 App.tsx                 # Root component
+├── 🔧 index.js               # Entry point
+├── 📦 package.json           # Dependencies
+├── ⚙️ metro.config.js        # Metro bundler config
+├── 🔷 tsconfig.json          # TypeScript config
+├── 🧪 jest.config.js         # Jest testing config
+│
+├── 📱 android/               # Android native code
+├── 🍎 ios/                   # iOS native code  
+│
+├── 📁 src/
+│   ├── 🧠 core/
+│   │   ├── entities/
+│   │   │   ├── user/User.ts
+│   │   │   └── cart/Cart.ts
+│   │   ├── errors/
+│   │   │   ├── BaseError.ts
+│   │   │   └── DomainErrors.ts
+│   │   ├── ports/
+│   │   │   ├── repositories/
+│   │   │   ├── services/
+│   │   │   └── datasources/
+│   │   └── usecases/
+│   │       ├── user/
+│   │       └── cart/
+│   │
+│   ├── 🔧 infrastructure/
+│   │   ├── api/
+│   │   │   ├── dtos/
+│   │   │   └── mappers/
+│   │   ├── database/
+│   │   │   ├── UserModel.ts
+│   │   │   ├── CartModel.ts
+│   │   │   └── schema.ts
+│   │   ├── datasources/
+│   │   │   ├── local/
+│   │   │   └── remote/
+│   │   ├── errors/
+│   │   │   ├── InfrastructureErrors.ts
+│   │   │   └── ErrorHandler.ts
+│   │   ├── patterns/
+│   │   │   └── CircuitBreaker.ts
+│   │   ├── repositories/
+│   │   │   ├── UserRepository.ts
+│   │   │   └── CartRepository.ts
+│   │   └── services/
+│   │       ├── ApiService.ts
+│   │       └── DatabaseService.ts
+│   │
+│   ├── 🎨 presentation/
+│   │   ├── components/
+│   │   │   ├── UserItem.tsx
+│   │   │   └── UserForm.tsx
+│   │   ├── mappers/
+│   │   │   └── UserViewMapper.ts
+│   │   ├── models/
+│   │   │   ├── UserViewModel.ts
+│   │   │   └── CartViewModel.ts
+│   │   ├── screens/
+│   │   │   ├── MainScreen.tsx
+│   │   │   └── UserListScreen.tsx
+│   │   └── store/
+│   │       ├── index.ts
+│   │       ├── hooks.ts
+│   │       └── slices/
+│   │           ├── usersSlice.ts
+│   │           └── cartsSlice.ts
+│   │
+│   ├── 🔌 di/
+│   │   ├── container.ts
+│   │   └── types.ts
+│   │
+│   ├── 🐛 debug/
+│   │   └── TestDI.ts
+│   │
+│   └── 📄 index.ts
+│
+├── 📋 __tests__/             # Test files
+├── 🎨 assets/                # Images, fonts, etc.
+└── 📚 docs/                  # Documentation
+    └── FLOW_DOCUMENTATION.md
+```
+
+## 🌐 Environment Configuration
+
+### Development
+
 ```bash
-# Android Release
+# .env.development
+API_BASE_URL=https://jsonplaceholder.typicode.com
+DATABASE_NAME=fnb_dev.db
+LOG_LEVEL=debug
+ENABLE_FLIPPER=true
+```
+
+### Production
+
+```bash
+# .env.production  
+API_BASE_URL=https://api.fnb-app.com
+DATABASE_NAME=fnb_prod.db
+LOG_LEVEL=error
+ENABLE_FLIPPER=false
+```
+
+## 📈 Performance
+
+### Optimization Strategies
+
+- **Code Splitting** - Dynamic imports cho large components
+- **Memoization** - React.memo và useMemo
+- **Virtualization** - FlatList cho large datasets
+- **Image Optimization** - Lazy loading và caching
+- **Bundle Analysis** - Metro bundle analyzer
+
+### Memory Management
+
+- **Singleton Services** - Shared instances cho API và Database
+- **Component Cleanup** - useEffect cleanup functions
+- **State Normalization** - Flat state structure trong Redux
+- **Cache Invalidation** - Intelligent cache management
+
+## 🚀 Deployment
+
+### Android
+
+```bash
+# Debug build
+npm run android
+
+# Release build
 cd android
 ./gradlew assembleRelease
 
-# iOS Release  
-cd ios
-xcodebuild -workspace fnb.xcworkspace -scheme fnb -configuration Release
+# Install release APK
+adb install app/build/outputs/apk/release/app-release.apk
 ```
 
-### Environment Setup
+### iOS
+
 ```bash
-# Development
-API_BASE_URL=http://localhost:3000/api
+# Debug build
+npm run ios
 
-# Production
-API_BASE_URL=https://api.yourapp.com
+# Release build (Xcode required)
+# Open ios/fnb.xcworkspace in Xcode
+# Product → Archive → Distribute App
 ```
 
-## 🎯 Best Practices & Conventions
+### CI/CD Pipeline
 
-### 🏗️ Clean Architecture Rules
+```yaml
+# .github/workflows/ci.yml
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - run: npm install
+      - run: npm test
+      - run: npm run lint
+      - run: npm run type-check
 ```
-✅ DO: Core không import Infrastructure/Presentation  
-✅ DO: Infrastructure implement Core interfaces
-✅ DO: Presentation chỉ import Core entities và use cases
-✅ DO: Sử dụng Dependency Injection cho loose coupling
-
-❌ DON'T: Core import bất kỳ framework nào
-❌ DON'T: Infrastructure import Presentation  
-❌ DON'T: Direct database/API calls từ UI components
-❌ DON'T: Business logic trong UI components
-```
-
-### 📝 Naming Conventions
-```typescript
-// Entities: Singular noun
-User, Cart, Order
-
-// Interfaces: I + PascalCase
-IUserRepository, IApiService
-
-// Use Cases: Verb + Noun + UseCase
-GetUsersUseCase, CreateUserUseCase
-
-// DTOs: Entity + Request/Response
-UserApiResponse, CreateUserRequest
-
-// Models: Entity + Model
-UserModel, CartModel (database)
-UserViewModel, CartViewModel (presentation)
-
-// Mappers: Entity + Layer + Mapper
-UserApiMapper, UserDbMapper, UserViewMapper
-```
-
-### 🔄 Mapper Responsibilities
-```typescript
-// API Mapper (Infrastructure): API ↔ Domain
-UserApiMapper.fromApiResponse(): UserApiResponse → User
-UserApiMapper.toApiRequest(): User → CreateUserRequest
-
-// DB Mapper (Infrastructure): Database ↔ Domain  
-UserDbMapper.fromDbModel(): UserModel → User
-UserDbMapper.toDbModel(): User → UserModel
-
-// View Mapper (Presentation): Domain ↔ View
-UserViewMapper.toViewModel(): User → UserViewModel
-UserViewMapper.fromViewModel(): UserViewModel → User
-```
-
-## 📈 Performance Optimizations
-
-### 🚀 Offline-First Strategy
-- **Local Cache**: WatermelonDB làm primary data source
-- **Background Sync**: Sync với API khi có network
-- **Optimistic Updates**: UI updates immediately
-- **Conflict Resolution**: Last-write-wins strategy
-
-### ⚡ React Native Optimizations  
-- **FlatList**: Virtualized lists cho large datasets
-- **Memoization**: React.memo cho expensive components
-- **Lazy Loading**: Code splitting cho screens
-- **Image Caching**: Optimized image loading
-
-## 🐛 Troubleshooting
-
-### Common Issues
-```bash
-# Metro bundler cache issues
-npm start -- --reset-cache
-
-# Android build issues  
-cd android && ./gradlew clean && cd ..
-
-# iOS build issues
-cd ios && xcodebuild clean && cd ..
-
-# TypeScript errors
-npx tsc --noEmit
-
-# Dependency issues
-rm -rf node_modules && npm install
-```
-
-### Architecture Violations
-```bash
-# Check dependency direction
-npx madge --circular --extensions ts,tsx src/
-
-# Find unused exports  
-npx ts-unused-exports tsconfig.json
-
-# Type checking
-npx tsc --noEmit --strict
-```
-
-## 📚 Further Reading
-
-### Clean Architecture Resources
-- [Clean Architecture by Uncle Bob](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
-- [Dependency Inversion Principle](https://en.wikipedia.org/wiki/Dependency_inversion_principle)
-- [Ports and Adapters Pattern](https://alistair.cockburn.us/hexagonal-architecture/)
-
-### React Native + Clean Architecture
-- [React Native Clean Architecture](https://github.com/eduardomoroni/react-native-clean-architecture)
-- [Clean Architecture in React](https://blog.cleancoder.com/uncle-bob/2011/11/22/Clean-Architecture.html)
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Follow Clean Architecture principles
-4. Add comprehensive tests
-5. Commit changes (`git commit -m 'Add AmazingFeature'`)
-6. Push to branch (`git push origin feature/AmazingFeature`)
-7. Open Pull Request
+### Development Workflow
+
+1. **Fork** repository
+2. **Create** feature branch: `git checkout -b feature/amazing-feature`
+3. **Commit** changes: `git commit -m 'Add amazing feature'`
+4. **Push** branch: `git push origin feature/amazing-feature`
+5. **Create** Pull Request
+
+### Coding Standards
+
+- **Clean Architecture** principles
+- **SOLID** principles
+- **DRY** (Don't Repeat Yourself)
+- **KISS** (Keep It Simple, Stupid)
+- **TypeScript** strict mode
+- **100% test coverage** cho business logic
+
+### Commit Convention
+
+```
+feat: add user authentication
+fix: resolve cart calculation bug
+docs: update API documentation
+style: format code with prettier
+refactor: improve error handling
+test: add unit tests for UserRepository
+chore: update dependencies
+```
+
+## 📄 License
+
+MIT License - xem [LICENSE](LICENSE) file để biết chi tiết.
+
+## 👥 Authors
+
+- **dolamanh** - *Initial work* - [dolamanh](https://github.com/dolamanh)
+
+## 🙏 Acknowledgments
+
+- **Uncle Bob** - Clean Architecture concepts
+- **Redux Team** - Redux Toolkit
+- **Nozbe** - WatermelonDB
+- **Microsoft** - TypeScript
+- **Facebook** - React Native
+
+## 📞 Support
+
+Nếu có vấn đề hoặc câu hỏi:
+
+- 🐛 **Issues**: [GitHub Issues](https://github.com/dolamanh/fnb/issues)
+- 📧 **Email**: dolamanh@example.com
+- 💬 **Discord**: [FnB App Community](https://discord.gg/fnb-app)
 
 ---
 
-**Built with ❤️ using Clean Architecture principles**
-// UserRepository.ts
-export class UserRepository implements IUserRepository {
-  async getAllUsers(): Promise<User[]> {
-    // Try cache first, then API
-    const cachedUsers = await this.localDataSource.getUsers();
-    if (cachedUsers.length > 0) {
-      return cachedUsers.map(UserMapper.fromDatabaseModel);
-    }
-    
-    const apiUsers = await this.remoteDataSource.getUsers();
-    // Cache for offline access
-    await this.localDataSource.saveUsers(apiUsers);
-    
-    return apiUsers.map(UserMapper.fromApiResponse);
-  }
-}
-```
-
-**5. Data Source (Infrastructure)**
-```typescript
-// UserRemoteDataSource.ts
-export class UserRemoteDataSource implements IUserRemoteDataSource {
-  async getUsers(): Promise<UserApiResponse[]> {
-    const response = await this.apiService.get<UserApiResponse[]>('/users');
-    return response.data;
-  }
-}
-```
-
-**6. UI Update (Presentation)**
-```typescript
-// UserListScreen.tsx
-const users = useAppSelector(state => state.users.data);
-const viewModels = users.map(UserViewMapper.toViewModel);
-
-return (
-  <FlatList
-    data={viewModels}
-    renderItem={({ item }) => <UserItem user={item} />}
-
+**Made with ❤️ by the FnB Team**

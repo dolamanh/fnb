@@ -8,7 +8,7 @@ import {
   Switch,
   Alert,
 } from 'react-native';
-import { User } from '../../core/entities/User';
+import { User } from '../../core/entities/user/User';
 
 interface UserFormProps {
   user?: User;

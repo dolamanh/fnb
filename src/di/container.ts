@@ -5,16 +5,16 @@ import { TYPES } from './types';
 // Infrastructure implementations
 import { ApiService } from '../infrastructure/services/ApiService';
 import { DatabaseService } from '../infrastructure/services/DatabaseService';
-import { UserRemoteDataSource } from '../infrastructure/datasources/UserRemoteDataSource';
-import { UserLocalDataSource } from '../infrastructure/datasources/UserLocalDataSource';
+import { UserRemoteDataSource } from '../infrastructure/datasources/remote/UserRemoteDataSource';
+import { UserLocalDataSource } from '../infrastructure/datasources/local/UserLocalDataSource';
 import { UserRepository } from '../infrastructure/repositories/UserRepository';
-import { CartRemoteDataSource } from '../infrastructure/datasources/CartRemoteDataSource';
+import { CartRemoteDataSource } from '../infrastructure/datasources/remote/CartRemoteDataSource';
 
 // Core ports
 import type { IApiService } from '../core/ports/services/IApiService';
 import type { IDatabaseService } from '../core/ports/services/IDatabaseService';
-import type { IUserLocalDataSource } from '../core/ports/datasources/IUserLocalDataSource';
-import type { IUserRemoteDataSource } from '../core/ports/datasources/IUserRemoteDataSource';
+import type { IUserLocalDataSource } from '../core/ports/datasources/local/IUserLocalDataSource';
+import type { IUserRemoteDataSource } from '../core/ports/datasources/remote/IUserRemoteDataSource';
 import type { IUserRepository } from '../core/ports/repositories/IUserRepository';
 
 // UseCases
@@ -22,10 +22,10 @@ import { GetUsersUseCase } from '../core/usecases/user/GetUsersUseCase';
 import { CreateUserUseCase } from '../core/usecases/user/CreateUserUseCase';
 import { UpdateUserUseCase } from '../core/usecases/user/UpdateUserUseCase';
 import { DeleteUserUseCase } from '../core/usecases/user/DeleteUserUseCase';
-import { ICartRemoteDataSource } from '../core/ports/datasources/ICartRemoteDataSource';
+import { ICartRemoteDataSource } from '../core/ports/datasources/remote/ICartRemoteDataSource';
 import { CartRepository } from '../infrastructure/repositories/CartRepository';
 import { ICartRepository } from '../core/ports/repositories/ICartRepository';
-import { GetCartsUseCase } from '../core/usecases/user/GetCartsUseCase';
+import { GetCartsUseCase } from '../core/usecases/cart/GetCartsUseCase';
 
 
 const container = new Container();

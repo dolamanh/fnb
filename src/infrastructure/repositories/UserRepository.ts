@@ -1,8 +1,8 @@
 import { injectable, inject } from 'inversify';
 import type { IUserRepository } from '../../core/ports/repositories/IUserRepository';
-import type { IUserRemoteDataSource } from '../../core/ports/datasources/IUserRemoteDataSource';
-import type { IUserLocalDataSource } from '../../core/ports/datasources/IUserLocalDataSource';
-import { User } from '../../core/entities/User';
+import type { IUserRemoteDataSource } from '../../core/ports/datasources/remote/IUserRemoteDataSource';
+import type { IUserLocalDataSource } from '../../core/ports/datasources/local/IUserLocalDataSource';
+import { User } from '../../core/entities/user/User';
 import { TYPES } from '../../di/types';
 
 @injectable()

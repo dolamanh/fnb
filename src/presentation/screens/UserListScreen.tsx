@@ -10,17 +10,17 @@ import {
   Modal,
   Platform,
 } from 'react-native';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { 
   fetchUsers, 
   createUser as createUserAction, 
   updateUser as updateUserAction, 
   deleteUser as deleteUserAction,
   clearError 
-} from '../../store/slices/usersSlice';
+} from '../store/slices/usersSlice';
 import { UserItem } from '../components/UserItem';
 import { UserForm } from '../components/UserForm';
-import { User } from '../../core/entities/User';
+import { User } from '../../core/entities/user/User';
 import { testDI } from '../../debug/TestDI';
 
 export const UserListScreen: React.FC = () => {

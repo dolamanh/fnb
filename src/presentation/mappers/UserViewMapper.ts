@@ -1,6 +1,6 @@
 // Presentation-specific mapper: Domain Entities ↔ View Models
 
-import { User } from '../../core/entities/User';
+import { User } from '../../core/entities/user/User';
 import { UserViewModel } from '../models/UserViewModel';
 
 export class UserViewMapper {

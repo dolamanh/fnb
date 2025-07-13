@@ -1,10 +1,10 @@
 import { inject, injectable } from "inversify";
-import type { Cart } from "../../core/entities/Cart";
-import type { ICartRemoteDataSource } from "../../core/ports/datasources/ICartRemoteDataSource";
-import type { IApiService } from "../../core/ports/services/IApiService";
-import { TYPES } from "../../di/types";
-import { CartMapper } from "../api/mappers/CartMapper";
-import { CartApiResponse, CartApiResponseWrapper } from "../api/dtos/CartResponse";
+import type { Cart } from "../../../core/entities/cart/Cart";
+import type { ICartRemoteDataSource } from "../../../core/ports/datasources/remote/ICartRemoteDataSource";
+import type { IApiService } from "../../../core/ports/services/IApiService";
+import { TYPES } from "../../../di/types";
+import { CartMapper } from "../../api/mappers/CartMapper";
+import { CartApiResponse, CartApiResponseWrapper } from "../../api/dtos/response/CartResponse";
 
 @injectable()
 export class CartRemoteDataSource implements ICartRemoteDataSource {

@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { Cart } from "../../entities/Cart";
+import { Cart } from "../../entities/cart/Cart";
 import { TYPES } from "../../../di/types";
 import { IUseCase } from "../base/IBaseUseCase";
 import type { ICartRepository } from "../../ports/repositories/ICartRepository";

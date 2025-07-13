@@ -1,7 +1,7 @@
-import { Cart } from "../../core/entities/Cart";
+import { Cart } from "../../../core/entities/cart/Cart";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { container } from "../../di/container";
-import { TYPES } from "../../di/types";
+import { container } from "../../../di/container";
+import { TYPES } from "../../../di/types";
 
 export interface CartState {
     carts: Cart[];

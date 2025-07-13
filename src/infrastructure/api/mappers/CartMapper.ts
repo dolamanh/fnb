@@ -1,6 +1,6 @@
 // Mappers to convert between different Cart model types
 
-import { Cart, CartItem, Table, Discount, ServiceFee, Tax, Combo } from '../../../core/entities/Cart';
+import { Cart, CartItem, Table, Discount, ServiceFee, Tax, Combo } from '../../../core/entities/cart/Cart';
 import { 
   CartApiResponse, 
   CartItemApiResponse, 
@@ -9,7 +9,7 @@ import {
   ServiceFeeApiResponse,
   TaxApiResponse,
   ComboApiResponse
-} from '../dtos/CartResponse';
+} from '../dtos/response/CartResponse';
 import { CartModel, CartItemModel, TableModel } from '../../database/CartModel';
 import { 
   CartViewModel, 

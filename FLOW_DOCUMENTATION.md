@@ -258,12 +258,13 @@ container.bind(TYPES.GetUsersUseCase).toDynamicValue(() => {
 
 ## 🔄 Luồng Redux State Management
 
-### Redux Store Configuration: `src/store/index.ts`
+### Redux Store Configuration: `src/presentation/store/index.ts`
 ```typescript
-// File: src/store/index.ts
+// File: src/presentation/store/index.ts
 export const store = configureStore({
   reducer: {
     users: usersReducer,      // Users slice
+    carts: cartsReducer,      // Carts slice
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -282,9 +283,9 @@ export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 ```
 
-### Users Slice: `src/store/slices/usersSlice.ts`
+### Users Slice: `src/presentation/store/slices/usersSlice.ts`
 ```typescript
-// File: src/store/slices/usersSlice.ts
+// File: src/presentation/store/slices/usersSlice.ts
 
 // 1. State Interface
 interface UsersState {
@@ -395,7 +396,7 @@ const usersSlice = createSlice({
 UserListScreen.tsx
       │ useEffect(() => dispatch(fetchUsers()))
       ▼
-store/slices/usersSlice.ts
+presentation/store/slices/usersSlice.ts
       │ fetchUsers async thunk
       ▼
 DI Container
@@ -404,7 +405,7 @@ DI Container
 core/usecases/user/GetUsersUseCase.ts
       │ execute() method
       ▼
-data/repositories/UserRepository.ts
+infrastructure/repositories/UserRepository.ts
       │ getUsers() method
       ▼
 ┌─────────────────┐         ┌─────────────────┐
@@ -446,13 +447,13 @@ UserForm.tsx
 UserListScreen.tsx
       │ dispatch(createUser(userData))
       ▼
-store/slices/usersSlice.ts
+presentation/store/slices/usersSlice.ts
       │ createUser async thunk
       ▼
 core/usecases/user/CreateUserUseCase.ts
       │ execute(userData)
       ▼
-data/repositories/UserRepository.ts
+infrastructure/repositories/UserRepository.ts
       │ createUser(userData)
       ▼
 ┌─────────────────┐         ┌─────────────────┐
@@ -561,33 +562,40 @@ App.tsx
 ### File Dependencies Map:
 ```
 App.tsx
-├── src/store/index.ts (Redux store)
-│   ├── src/store/slices/usersSlice.ts
-│   │   ├── src/core/entities/User.ts
+├── src/presentation/store/index.ts (Redux store)
+│   ├── src/presentation/store/slices/usersSlice.ts
+│   │   ├── src/core/entities/user/User.ts
 │   │   ├── src/di/container.ts
 │   │   └── src/di/types.ts
-│   └── src/store/hooks.ts
-│       └── src/store/index.ts (RootState, AppDispatch)
+│   ├── src/presentation/store/slices/cartsSlice.ts
+│   │   ├── src/core/entities/cart/Cart.ts
+│   │   ├── src/di/container.ts
+│   │   └── src/di/types.ts
+│   └── src/presentation/store/hooks.ts
+│       └── src/presentation/store/index.ts (RootState, AppDispatch)
 │
 ├── src/di/container.ts (DI setup)
 │   ├── src/di/types.ts (Symbols)
-│   ├── src/data/datasources/ApiService.ts
-│   ├── src/data/datasources/DatabaseService.ts
-│   ├── src/data/datasources/UserRemoteDataSource.ts
-│   ├── src/data/datasources/UserLocalDataSource.ts
-│   ├── src/data/repositories/UserRepository.ts
+│   ├── src/infrastructure/services/ApiService.ts
+│   ├── src/infrastructure/services/DatabaseService.ts
+│   ├── src/infrastructure/datasources/remote/UserRemoteDataSource.ts
+│   ├── src/infrastructure/datasources/remote/CartRemoteDataSource.ts
+│   ├── src/infrastructure/datasources/local/UserLocalDataSource.ts
+│   ├── src/infrastructure/repositories/UserRepository.ts
+│   ├── src/infrastructure/repositories/CartRepository.ts
 │   ├── src/core/usecases/user/GetUsersUseCase.ts
 │   ├── src/core/usecases/user/CreateUserUseCase.ts
 │   ├── src/core/usecases/user/UpdateUserUseCase.ts
-│   └── src/core/usecases/user/DeleteUserUseCase.ts
+│   ├── src/core/usecases/user/DeleteUserUseCase.ts
+│   └── src/core/usecases/cart/GetCartsUseCase.ts
 │
 └── src/presentation/screens/UserListScreen.tsx
-    ├── src/store/hooks.ts (useAppDispatch, useAppSelector)
-    ├── src/store/slices/usersSlice.ts (actions)
+    ├── src/presentation/store/hooks.ts (useAppDispatch, useAppSelector)
+    ├── src/presentation/store/slices/usersSlice.ts (actions)
     ├── src/presentation/components/UserItem.tsx
-    │   └── src/core/entities/User.ts
+    │   └── src/core/entities/user/User.ts
     ├── src/presentation/components/UserForm.tsx
-    │   └── src/core/entities/User.ts
+    │   └── src/core/entities/user/User.ts
     └── src/debug/TestDI.ts
 ```
 
@@ -785,11 +793,62 @@ Production:
 Ứng dụng FnB được xây dựng với Clean Architecture và Redux Toolkit, đảm bảo:
 
 - **Separation of Concerns**: Mỗi layer có trách nhiệm riêng biệt
+  - **Core**: Business logic và entities
+  - **Infrastructure**: Framework implementations 
+  - **Presentation**: UI components và state management
+  - **DI**: Dependency injection và wiring
+
 - **Dependency Inversion**: Dependencies được inject, không hard-coded
+  - Services, Repositories, Use Cases đều được inject qua DI container
+  - Interfaces trong Core, implementations trong Infrastructure
+
+- **Error Handling**: Phân tầng rõ ràng theo từng layer
+  - **Domain Errors** (core/errors): ValidationError, BusinessRuleError, NotFoundError, UnauthorizedError
+  - **Infrastructure Errors** (infrastructure/errors): ApiError, NetworkError, DatabaseError, TimeoutError
+  - **Error Handler**: Centralized error processing và logging
+
 - **Testability**: Các layer có thể test độc lập
+  - Core logic hoàn toàn isolated
+  - Mock implementations dễ dàng cho testing
+  - DI container hỗ trợ test configuration
+
 - **Scalability**: Dễ dàng thêm features mới
+  - Thêm entities, use cases mới trong Core
+  - Implement repositories, datasources mới trong Infrastructure
+  - Tạo screens, components mới trong Presentation
+
 - **Maintainability**: Code dễ đọc, sửa đổi và maintain
+  - Cấu trúc folder rõ ràng theo từng layer
+  - Naming convention nhất quán
+  - Documentation đầy đủ
+
 - **Type Safety**: Full TypeScript support
+  - Strict typing cho tất cả layers
+  - Interface contracts được enforce
+  - Runtime type checking
+
 - **State Management**: Predictable state updates với Redux
+  - Centralized state trong Presentation layer
+  - Async thunks kết nối với Use Cases
+  - Type-safe selectors và dispatchers
+
+### 🎯 Architectural Benefits
+
+1. **Independence**: Core business logic không phụ thuộc vào framework
+2. **Flexibility**: Dễ dàng thay đổi database, API, UI framework
+3. **Testing**: High test coverage với isolated unit tests
+4. **Team Development**: Multiple developers có thể work trên different layers
+5. **Code Reuse**: Business logic có thể reuse across platforms
+6. **Performance**: Optimized data flow và efficient state management
+
+### 🚀 Future Enhancements
+
+- **Authentication Layer**: Add JWT token management
+- **Caching Strategy**: Implement intelligent caching với TTL
+- **Real-time Updates**: WebSocket integration cho live data
+- **Offline Sync**: Advanced conflict resolution
+- **Analytics**: User behavior tracking và performance monitoring
+- **Internationalization**: Multi-language support
+- **Theme System**: Dynamic theming với dark/light modes
 
 Kiến trúc này cho phép team development hiệu quả và đảm bảo chất lượng code cao trong dài hạn.

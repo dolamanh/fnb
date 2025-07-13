@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { User } from '../../core/entities/User';
-import { container } from '../../di/container';
-import { TYPES } from '../../di/types';
+import { User } from '../../../core/entities/user/User';
+import { container } from '../../../di/container';
+import { TYPES } from '../../../di/types';
 
 // State interface
 export interface UsersState {

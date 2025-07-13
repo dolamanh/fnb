@@ -6,7 +6,7 @@
 import React, { useEffect } from 'react';
 import { StatusBar, StyleSheet, useColorScheme, View, Alert, SafeAreaView, Platform } from 'react-native';
 import { Provider } from 'react-redux';
-import { store } from './src/store';
+import { store } from './src/presentation/store';
 import { container } from './src/di/container';
 import { TYPES } from './src/di/types';
 import { IDatabaseService } from './src/core/ports/services/IDatabaseService';

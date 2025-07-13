@@ -1,11 +1,11 @@
 import { injectable, inject } from 'inversify';
-import type { IUserRemoteDataSource } from '../../core/ports/datasources/IUserRemoteDataSource';
-import type { IApiService } from '../../core/ports/services/IApiService';
-import { User } from '../../core/entities/User';
-import { UserApiResponse } from '../api/dtos/UserResponse';
-import { UserMapper } from '../api/mappers/UserMapper';
-import { TYPES } from '../../di/types';
-import { handleApiError, logError } from '../../utils/errorHandler';
+import type { IUserRemoteDataSource } from '../../../core/ports/datasources/remote/IUserRemoteDataSource';
+import type { IApiService } from '../../../core/ports/services/IApiService';
+import { User } from '../../../core/entities/user/User';
+import { UserApiResponse } from '../../api/dtos/response/UserResponse';
+import { UserMapper } from '../../api/mappers/UserMapper';
+import { TYPES } from '../../../di/types';
+import { handleApiError, logError } from '../../errors/ErrorHandler';
 
 @injectable()
 export class UserRemoteDataSource implements IUserRemoteDataSource {

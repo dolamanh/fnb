@@ -1,7 +1,7 @@
 import { injectable, inject } from 'inversify';
 import type { IUserRepository } from '../../ports/repositories/IUserRepository';
 import { TYPES } from '../../../di/types';
-import { User } from '../../entities/User';
+import { User } from '../../entities/user/User';
 import { IUseCase } from '../base/IBaseUseCase';
 
 // Simple types inline

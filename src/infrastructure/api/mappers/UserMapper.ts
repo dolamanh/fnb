@@ -1,7 +1,7 @@
 // Mappers to convert between different model types
 
-import { User } from '../../../core/entities/User';
-import { UserApiResponse } from '../dtos/UserResponse';
+import { User } from '../../../core/entities/user/User';
+import { UserApiResponse } from '../dtos/response/UserResponse';
 import { UserModel } from '../../database/UserModel';
 import { UserViewModel } from '../../../presentation/models/UserViewModel';
 
