@@ -21,15 +21,19 @@ FnB App là ứng dụng quản lý Food & Beverage được xây dựng theo **
 
 ## 🏗️ Kiến trúc Clean Architecture
 
+### 📊 Tổng quan các tầng
+
+Clean Architecture chia ứng dụng thành các tầng độc lập, mỗi tầng có trách nhiệm riêng biệt và tuân thủ nguyên tắc **Dependency Rule** - tầng trong không được phụ thuộc vào tầng ngoài.
+
 ```
 src/
-├── 🧠 core/                    # Domain Layer
+├── 🧠 core/                    # Domain Layer (Tầng nghiệp vụ)
 │   ├── entities/              # Business entities (User, Cart)
 │   ├── errors/                # Domain errors (ValidationError, BusinessRuleError)
 │   ├── ports/                 # Interfaces (repositories, services, datasources)
 │   └── usecases/              # Business logic (GetUsers, CreateUser, etc.)
 │
-├── 🔧 infrastructure/         # Framework Layer
+├── 🔧 infrastructure/         # Framework Layer (Tầng hạ tầng)
 │   ├── api/                   # DTOs và mappers cho API
 │   ├── database/              # Database models và schema
 │   ├── datasources/           # Concrete implementations (remote/local)
@@ -38,20 +42,181 @@ src/
 │   ├── repositories/          # Repository implementations
 │   └── services/              # Service implementations (API, Database)
 │
-├── 🎨 presentation/           # UI Layer
+├── 🎨 presentation/           # UI Layer (Tầng giao diện)
 │   ├── components/            # Reusable React components
 │   ├── mappers/               # View mappers (Domain → ViewModel)
 │   ├── models/                # ViewModels cho UI
 │   ├── screens/               # Screen components
 │   └── store/                 # Redux store, slices, hooks
 │
-├── 🔌 di/                     # Dependency Injection
+├── 🔌 di/                     # Dependency Injection (Container quản lý phụ thuộc)
 │   ├── container.ts           # DI container configuration
 │   └── types.ts               # DI type symbols
 │
-└── 🐛 debug/                  # Debug utilities
+└── 🐛 debug/                  # Debug utilities (Công cụ debug)
     └── TestDI.ts              # DI testing utilities
 ```
+
+### 🧠 Core Layer - Tầng Domain (Trái tim ứng dụng)
+
+**🎯 Mục đích:**
+- Chứa logic nghiệp vụ thuần túy của ứng dụng
+- Định nghĩa các quy tắc kinh doanh và entities
+- Hoàn toàn độc lập với framework và công nghệ bên ngoài
+
+**⚡ Lý do tồn tại:**
+- Đảm bảo business logic không bị ảnh hưởng bởi thay đổi công nghệ
+- Tạo ra một "ngôn ngữ chung" cho toàn bộ team development
+- Dễ dàng testing vì không có external dependencies
+
+**💡 Lợi ích:**
+- **Tính ổn định cao**: Logic nghiệp vụ không thay đổi khi đổi database hoặc UI framework
+- **Dễ testing**: Unit test thuần túy, nhanh và đáng tin cậy
+- **Tái sử dụng**: Business logic có thể dùng cho web, mobile, desktop
+- **Hiểu biết domain**: Code phản ánh đúng ngôn ngữ nghiệp vụ
+
+**🔍 Ý nghĩa kiến trúc:**
+- **Entities**: Đại diện cho các đối tượng nghiệp vụ (User, Cart) với các thuộc tính và hành vi cơ bản
+- **Use Cases**: Thực hiện các tác vụ nghiệp vụ cụ thể (CreateUser, GetUsers) 
+- **Ports**: Định nghĩa interface cho các dependency (Repository, Service)
+- **Errors**: Xử lý các lỗi liên quan đến business rule
+
+**🏛️ Cơ sở lý thuyết:**
+- **Domain-Driven Design (DDD)**: Tập trung vào domain của ứng dụng
+- **SOLID Principles**: Đặc biệt là Dependency Inversion Principle
+- **Single Responsibility**: Mỗi class chỉ có một lý do để thay đổi
+
+### 🔧 Infrastructure Layer - Tầng Hạ tầng (Kết nối thế giới bên ngoài)
+
+**🎯 Mục đích:**
+- Implement các interface được định nghĩa trong Core layer
+- Xử lý communication với external systems (API, Database, File system)
+- Chứa các framework-specific code và third-party integrations
+
+**⚡ Lý do tồn tại:**
+- Tách biệt technical concerns khỏi business logic
+- Cho phép thay đổi technology stack mà không ảnh hưởng Core
+- Centralize configuration và setup cho external dependencies
+
+**💡 Lợi ích:**
+- **Flexibility**: Dễ dàng thay đổi database từ WatermelonDB sang SQLite
+- **Testability**: Mock được external dependencies trong testing
+- **Maintainability**: Technical debt tập trung ở một layer
+- **Scalability**: Optimize performance mà không ảnh hưởng business logic
+
+**🔍 Ý nghĩa kiến trúc:**
+- **API**: Data Transfer Objects và mappers cho RESTful communication
+- **Database**: ORM models và database schema configuration
+- **DataSources**: Concrete implementations cho local/remote data access
+- **Repositories**: Implement business repositories với data persistence logic
+- **Services**: External service integrations (Email, Payment, etc.)
+- **Patterns**: Infrastructure patterns như Circuit Breaker, Retry, Caching
+
+**🏛️ Cơ sở lý thuyết:**
+- **Hexagonal Architecture**: Ports & Adapters pattern
+- **Repository Pattern**: Encapsulate data access logic
+- **Adapter Pattern**: Convert external interfaces thành internal interfaces
+
+### 🎨 Presentation Layer - Tầng Giao diện (Tương tác với người dùng)
+
+**🎯 Mục đích:**
+- Hiển thị thông tin cho user và nhận input từ user
+- Manage UI state và coordinate user interactions
+- Transform domain data thành format phù hợp cho UI
+
+**⚡ Lý do tồn tại:**
+- Tách biệt UI concerns khỏi business logic
+- Cung cấp consistent user experience
+- Handle device-specific UI requirements
+
+**💡 Lợi ích:**
+- **User Experience**: Optimized cho mobile platform specifics
+- **Reusability**: Components có thể reuse across multiple screens
+- **Maintainability**: UI changes không ảnh hưởng business logic
+- **Testability**: UI logic có thể test riêng biệt
+
+**🔍 Ý nghĩa kiến trúc:**
+- **Components**: Reusable UI building blocks (Button, Input, Card)
+- **Screens**: Complete user interfaces cho specific use cases
+- **Models**: ViewModels transform domain data cho UI consumption
+- **Mappers**: Convert domain entities thành presentation models
+- **Store**: State management với Redux cho predictable state updates
+
+**🏛️ Cơ sở lý thuyết:**
+- **Model-View-ViewModel (MVVM)**: Separation of UI và presentation logic
+- **Observer Pattern**: State changes trigger UI updates
+- **Component-Based Architecture**: Modular và reusable UI components
+
+### 🔌 Dependency Injection Layer - Tầng Quản lý Phụ thuộc
+
+**🎯 Mục đích:**
+- Wire up all dependencies giữa các layers
+- Provide centralized configuration cho object creation
+- Enable loose coupling giữa các components
+
+**⚡ Lý do tồn tại:**
+- Implement Dependency Inversion Principle
+- Make code testable với mock dependencies
+- Centralize object lifecycle management
+
+**💡 Lợi ích:**
+- **Testability**: Easy mocking cho unit tests
+- **Flexibility**: Swap implementations mà không thay đổi code
+- **Maintainability**: Centralized dependency configuration
+- **Performance**: Singleton pattern cho expensive objects
+
+**🔍 Ý nghĩa kiến trúc:**
+- **Container**: InversifyJS container quản lý object creation
+- **Types**: Symbol-based type definitions cho type-safe injection
+- **Bindings**: Configuration mapping interfaces to implementations
+
+**🏛️ Cơ sở lý thuyết:**
+- **Inversion of Control (IoC)**: Dependencies được inject từ bên ngoài
+- **Dependency Injection Pattern**: Constructor injection cho clean dependencies
+- **Service Locator Pattern**: Centralized service discovery
+
+### 🐛 Debug Layer - Tầng Công cụ Debug
+
+**🎯 Mục đích:**
+- Provide development tools và debugging utilities
+- Test DI container configuration
+- Monitor application behavior trong development
+
+**⚡ Lý do tồn tại:**
+- Improve developer experience
+- Quick verification của architecture setup
+- Development-time diagnostics
+
+**💡 Lợi ích:**
+- **Developer Productivity**: Faster debugging và issue resolution
+- **Architecture Validation**: Verify Clean Architecture compliance
+- **Development Confidence**: Ensure proper wiring của dependencies
+
+### 🎯 Tổng kết Architectural Benefits
+
+**1. 🛡️ Independence (Tính độc lập)**
+- Core business logic hoàn toàn independent từ UI và database
+- Có thể develop, test, và deploy các layer riêng biệt
+
+**2. 🔄 Testability (Khả năng kiểm thử)**
+- Unit test business logic mà không cần database hay UI
+- Integration test infrastructure layer với mock core
+- UI testing với mock business logic
+
+**3. 🔧 Maintainability (Dễ bảo trì)**
+- Thay đổi một layer không ảnh hưởng layers khác
+- Clear separation of concerns
+- Code dễ hiểu và modify
+
+**4. 📈 Scalability (Khả năng mở rộng)**
+- Thêm features mới mà không breaking existing code
+- Multiple teams có thể work trên different layers
+- Easy horizontal scaling với microservices
+
+**5. 🚀 Technology Agnostic (Độc lập công nghệ)**
+- Thay đổi từ React Native sang Flutter mà business logic không đổi
+- Switch database từ WatermelonDB sang PostgreSQL
+- Replace Redux với MobX hay Zustand
 
 ## 🔄 Dependency Direction
 
