@@ -8,6 +8,7 @@ import { DatabaseService } from '../infrastructure/services/DatabaseService';
 import { UserRemoteDataSource } from '../infrastructure/datasources/UserRemoteDataSource';
 import { UserLocalDataSource } from '../infrastructure/datasources/UserLocalDataSource';
 import { UserRepository } from '../infrastructure/repositories/UserRepository';
+import { CartRemoteDataSource } from '../infrastructure/datasources/CartRemoteDataSource';
 
 // Core ports
 import type { IApiService } from '../core/ports/services/IApiService';
@@ -21,6 +22,11 @@ import { GetUsersUseCase } from '../core/usecases/user/GetUsersUseCase';
 import { CreateUserUseCase } from '../core/usecases/user/CreateUserUseCase';
 import { UpdateUserUseCase } from '../core/usecases/user/UpdateUserUseCase';
 import { DeleteUserUseCase } from '../core/usecases/user/DeleteUserUseCase';
+import { ICartRemoteDataSource } from '../core/ports/datasources/ICartRemoteDataSource';
+import { CartRepository } from '../infrastructure/repositories/CartRepository';
+import { ICartRepository } from '../core/ports/repositories/ICartRepository';
+import { GetCartsUseCase } from '../core/usecases/user/GetCartsUseCase';
+
 
 const container = new Container();
 
@@ -49,6 +55,16 @@ container.bind(TYPES.UserRepository).toDynamicValue(() => {
   return new UserRepository(localDataSource, remoteDataSource);
 });
 
+container.bind(TYPES.CartRemoteDataSource).toDynamicValue(() => {
+  const apiService = container.get<IApiService>(TYPES.ApiService);
+  return new CartRemoteDataSource(apiService);
+});
+
+container.bind(TYPES.CartRepository).toDynamicValue(() => {
+  const remoteDataSource = container.get<ICartRemoteDataSource>(TYPES.CartRemoteDataSource);
+  return new CartRepository(remoteDataSource);
+});
+
 // Use Cases - đơn giản hóa, không cần type complex
 container.bind(TYPES.GetUsersUseCase).toDynamicValue(() => {
   const userRepository = container.get<IUserRepository>(TYPES.UserRepository);
@@ -68,6 +84,11 @@ container.bind(TYPES.UpdateUserUseCase).toDynamicValue(() => {
 container.bind(TYPES.DeleteUserUseCase).toDynamicValue(() => {
   const userRepository = container.get<IUserRepository>(TYPES.UserRepository);
   return new DeleteUserUseCase(userRepository);
+});
+
+container.bind(TYPES.GetCartsUseCase).toDynamicValue(() => {
+  const cartRepository = container.get<ICartRepository>(TYPES.CartRepository);
+  return new GetCartsUseCase(cartRepository);
 });
 
 export { container };

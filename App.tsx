@@ -11,6 +11,7 @@ import { container } from './src/di/container';
 import { TYPES } from './src/di/types';
 import { IDatabaseService } from './src/core/ports/services/IDatabaseService';
 import { UserListScreen } from './src/presentation/screens/UserListScreen';
+import { MainScreen } from './src/presentation/screens/MainScreen';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -33,7 +34,7 @@ function App() {
   return (
     <Provider store={store}>
       <SafeAreaView style={styles.container}>
-        <UserListScreen />
+        <MainScreen />
       </SafeAreaView>
     </Provider>
   );

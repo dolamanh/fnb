@@ -1,20 +1,18 @@
 import { configureStore } from '@reduxjs/toolkit';
 import usersReducer from './slices/usersSlice';
+import cartsReducer from './slices/cartsSlice';
 
 // Configure Redux Store
 export const store = configureStore({
   reducer: {
     users: usersReducer,
+    carts: cartsReducer, // Add carts slice reducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Ignore these action types for Date objects in User entity
-        ignoredActions: ['users/createUser/fulfilled', 'users/updateUser/fulfilled', 'users/fetchUsers/fulfilled'],
-        // Ignore these field paths in all actions
-        ignoredActionsPaths: ['payload.createdAt', 'payload.updatedAt'],
-        // Ignore these paths in the state
-        ignoredPaths: ['users.users'],
+        ignoredActions: ['users/getUsers/fulfilled', 'carts/getCarts/fulfilled'],
+        ignoredPaths: ['users.users', 'carts.carts'],
       },
     }),
   devTools: __DEV__,

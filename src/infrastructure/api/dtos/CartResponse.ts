@@ -1,5 +1,16 @@
 // API Response Models for Cart operations
 
+export interface CartApiResponseWrapper {
+    carts: CartApiResponse[];
+    metadata: {
+        total: number;
+        page: number;
+        version: number;
+        limit: number;
+        total_price: number;
+    };
+}
+
 export interface CartApiResponse {
   client_id: string;
   customer_id: string;

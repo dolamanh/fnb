@@ -9,7 +9,7 @@ export class ApiService implements IApiService {
 
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: 'ttps://fnb-dev.mysapo.vn/admin', // Example API
+      baseURL: 'https://fnb-dev.mysapo.vn/admin', // Example API
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
