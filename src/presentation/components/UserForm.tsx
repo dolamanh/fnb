@@ -1,122 +1,142 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
   Switch,
   Alert,
 } from 'react-native';
 import { User } from '../../core/entities/user/User';
+import { useTranslation } from 'react-i18next';
+import { BaseText } from './base/BaseText';
+import { BaseInput } from './base/BaseInput';
+import { BaseButton } from './base/BaseButton';
 
 interface UserFormProps {
   user?: User;
-  onSave: (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  onSubmit: (userData: Partial<User>) => void;
   onCancel: () => void;
-  loading: boolean;
 }
 
 export const UserForm: React.FC<UserFormProps> = ({
   user,
-  onSave,
+  onSubmit,
   onCancel,
-  loading,
 }) => {
+  const { t } = useTranslation();
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [isActive, setIsActive] = useState(user?.isActive ?? true);
 
-  const handleSave = async () => {
-    if (!name.trim() || !email.trim()) {
-      Alert.alert('Error', 'Name and email are required');
-      return;
+  const [errors, setErrors] = useState<{
+    name?: string;
+    email?: string;
+    phone?: string;
+  }>({});
+
+  const validateForm = () => {
+    const newErrors: typeof errors = {};
+
+    if (!name.trim()) {
+      newErrors.name = t('users.form.nameRequired');
     }
 
-    try {
-      await onSave({
+    if (!email.trim()) {
+      newErrors.email = t('users.form.emailRequired');
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = t('users.form.emailInvalid');
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = () => {
+    if (validateForm()) {
+      const userData: Partial<User> = {
         name: name.trim(),
         email: email.trim(),
         phone: phone.trim() || undefined,
         isActive,
-      });
-    } catch (error) {
-      Alert.alert('Error', 'Failed to save user');
+      };
+      onSubmit(userData);
+    } else {
+      Alert.alert(t('common.error'), t('validation.required'));
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        {user ? 'Edit User' : 'Create New User'}
-      </Text>
+      <BaseText variant="h2" style={styles.title}>
+        {user ? t('users.editUser') : t('users.addUser')}
+      </BaseText>
 
       <View style={styles.form}>
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Name *</Text>
-          <TextInput
-            style={styles.input}
+        <View style={styles.field}>
+          <BaseText variant="body1" style={styles.label}>
+            {t('users.form.name')} *
+          </BaseText>
+          <BaseInput
+            placeholder={t('users.form.namePlaceholder')}
             value={name}
             onChangeText={setName}
-            placeholder="Enter name"
-            editable={!loading}
+            error={errors.name}
           />
         </View>
 
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Email *</Text>
-          <TextInput
-            style={styles.input}
+        <View style={styles.field}>
+          <BaseText variant="body1" style={styles.label}>
+            {t('users.form.email')} *
+          </BaseText>
+          <BaseInput
+            placeholder={t('users.form.emailPlaceholder')}
             value={email}
             onChangeText={setEmail}
-            placeholder="Enter email"
             keyboardType="email-address"
             autoCapitalize="none"
-            editable={!loading}
+            error={errors.email}
           />
         </View>
 
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Phone</Text>
-          <TextInput
-            style={styles.input}
+        <View style={styles.field}>
+          <BaseText variant="body1" style={styles.label}>
+            {t('users.form.phone')}
+          </BaseText>
+          <BaseInput
+            placeholder={t('users.form.phonePlaceholder')}
             value={phone}
             onChangeText={setPhone}
-            placeholder="Enter phone number"
             keyboardType="phone-pad"
-            editable={!loading}
+            error={errors.phone}
           />
         </View>
 
-        <View style={styles.switchGroup}>
-          <Text style={styles.label}>Active</Text>
+        <View style={styles.switchField}>
+          <BaseText variant="body1" style={styles.label}>
+            Active
+          </BaseText>
           <Switch
             value={isActive}
             onValueChange={setIsActive}
-            disabled={loading}
+            trackColor={{ false: '#767577', true: '#81b0ff' }}
+            thumbColor={isActive ? '#f5dd4b' : '#f4f3f4'}
           />
         </View>
       </View>
 
-      <View style={styles.actions}>
-        <TouchableOpacity
-          style={[styles.button, styles.cancelButton]}
+      <View style={styles.buttons}>
+        <BaseButton
+          title={t('common.cancel')}
           onPress={onCancel}
-          disabled={loading}
-        >
-          <Text style={styles.cancelButtonText}>Cancel</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.button, styles.saveButton, loading && styles.disabledButton]}
-          onPress={handleSave}
-          disabled={loading}
-        >
-          <Text style={styles.saveButtonText}>
-            {loading ? 'Saving...' : 'Save'}
-          </Text>
-        </TouchableOpacity>
+          variant="outline"
+          style={styles.cancelButton}
+        />
+        <BaseButton
+          title={t('common.save')}
+          onPress={handleSubmit}
+          variant="primary"
+          style={styles.saveButton}
+        />
       </View>
     </View>
   );
@@ -124,81 +144,47 @@ export const UserForm: React.FC<UserFormProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
-    margin: 16,
-    borderRadius: 8,
+    flex: 1,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    backgroundColor: '#fff',
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 20,
+    marginBottom: 24,
     textAlign: 'center',
   },
   form: {
+    flex: 1,
+  },
+  field: {
     marginBottom: 20,
   },
-  inputGroup: {
-    marginBottom: 16,
+  label: {
+    marginBottom: 8,
+    fontWeight: '600',
+    color: '#333',
   },
-  switchGroup: {
+  switchField: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
+    paddingVertical: 10,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#f9f9f9',
-  },
-  actions: {
+  buttons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  button: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginHorizontal: 8,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
   },
   cancelButton: {
-    backgroundColor: '#f0f0f0',
+    flex: 1,
+    marginRight: 10,
   },
   saveButton: {
-    backgroundColor: '#007AFF',
-  },
-  disabledButton: {
-    backgroundColor: '#ccc',
-  },
-  cancelButtonText: {
-    color: '#333',
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
+    flex: 1,
+    marginLeft: 10,
   },
 });
+
+export default UserForm;

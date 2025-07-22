@@ -1,22 +1,26 @@
 import React, { useEffect } from 'react';
 import {
     View,
-    Text,
     FlatList,
     StyleSheet,
-    TouchableOpacity,
-    ActivityIndicator,
     Alert,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { getCarts } from '../store/slices/cartsSlice';
 import { Cart } from '../../core/entities/cart/Cart';
+import { useTranslation } from '../i18n/hooks';
+import { BaseText } from '../components/base/BaseText';
+import { BaseButton } from '../components/base/BaseButton';
+import { BaseCard } from '../components/base/BaseCard';
+import { BaseLoading } from '../components/base/BaseLoading';
+import { LanguageButton } from '../components/base/LanguageButton';
 
 export const MainScreen: React.FC = () => {
     const state = useAppSelector((state) => state);
     console.log(state);
     const dispatch = useAppDispatch();
     const { carts, loading, error } = useAppSelector((state) => state.carts);
+    const { t } = useTranslation();
 
     useEffect(() => {
         dispatch(getCarts());
@@ -27,50 +31,49 @@ export const MainScreen: React.FC = () => {
     };
 
     const handleCartPress = (cart: Cart) => {
-        Alert.alert('Cart Selected', `Cart ID: ${cart.client_id}`);
+        Alert.alert(t('carts.cartSelected'), `${t('carts.cartId')}: ${cart.client_id}`);
     };
 
     const renderCartItem = ({ item }: { item: Cart }) => (
-        <TouchableOpacity
-            style={styles.cartItem}
-            onPress={() => handleCartPress(item)}
-        >
+        <BaseCard style={styles.cartItem} onPress={() => handleCartPress(item)}>
             <View style={styles.cartHeader}>
-                <Text style={styles.cartId}>Cart #{item.client_id}</Text>
-                <Text style={[styles.status, { color: getStatusColor(item.status) }]}>
+                <BaseText variant="h6" style={styles.cartId}>
+                    {t('carts.cartIdLabel')} #{item.client_id}
+                </BaseText>
+                <BaseText variant="caption" style={{color: getStatusColor(item.status)}}>
                     {item.status}
-                </Text>
+                </BaseText>
             </View>
 
             <View style={styles.cartDetails}>
-                <Text style={styles.customerName}>
-                    Customer: {item.name || 'N/A'}
-                </Text>
-                <Text style={styles.customerCount}>
-                    People: {item.customer_count}
-                </Text>
-                <Text style={styles.cashier}>
-                    Cashier: {item.cashier_name || 'N/A'}
-                </Text>
+                <BaseText variant="body1" style={styles.customerName}>
+                    {t('carts.customer')}: {item.name || 'N/A'}
+                </BaseText>
+                <BaseText variant="caption" style={styles.customerCount}>
+                    {t('carts.people')}: {item.customer_count}
+                </BaseText>
+                <BaseText variant="caption" style={styles.cashier}>
+                    {t('carts.cashier')}: {item.cashier_name || 'N/A'}
+                </BaseText>
             </View>
 
             <View style={styles.cartFooter}>
-                <Text style={styles.totalPrice}>
-                    Total: ${item.total_price?.toFixed(2) || '0.00'}
-                </Text>
-                <Text style={styles.itemCount}>
-                    Items: {item.items?.length || 0}
-                </Text>
+                <BaseText variant="h6" style={styles.totalPrice}>
+                    {t('carts.total')}: ${item.total_price?.toFixed(2) || '0.00'}
+                </BaseText>
+                <BaseText variant="caption" style={styles.itemCount}>
+                    {t('carts.items')}: {item.items?.length || 0}
+                </BaseText>
             </View>
 
             {item.table && (
                 <View style={styles.tableInfo}>
-                    <Text style={styles.tableText}>
-                        Table: {item.table.name}
-                    </Text>
+                    <BaseText variant="caption" style={styles.tableText}>
+                        {t('carts.table')}: {item.table.name}
+                    </BaseText>
                 </View>
             )}
-        </TouchableOpacity>
+        </BaseCard>
     );
 
     const getStatusColor = (status: string) => {
@@ -85,8 +88,10 @@ export const MainScreen: React.FC = () => {
     if (loading && carts.length === 0) {
         return (
             <View style={styles.centerContainer}>
-                <ActivityIndicator size="large" color="#2196F3" />
-                <Text style={styles.loadingText}>Loading carts...</Text>
+                <BaseLoading size="large" />
+                <BaseText variant="body1" style={styles.loadingText}>
+                    {t('carts.loadingCarts')}
+                </BaseText>
             </View>
         );
     }
@@ -94,10 +99,14 @@ export const MainScreen: React.FC = () => {
     if (error) {
         return (
             <View style={styles.centerContainer}>
-                <Text style={styles.errorText}>Error: {error}</Text>
-                <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
-                    <Text style={styles.retryText}>Retry</Text>
-                </TouchableOpacity>
+                <BaseText variant="body1" style={styles.errorText}>
+                    {t('common.error')}: {error}
+                </BaseText>
+                <BaseButton 
+                    title={t('common.retry')} 
+                    onPress={handleRefresh}
+                    style={styles.retryButton}
+                />
             </View>
         );
     }
@@ -105,10 +114,16 @@ export const MainScreen: React.FC = () => {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.title}>Restaurant Orders</Text>
-                <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
-                    <Text style={styles.refreshText}>Refresh</Text>
-                </TouchableOpacity>
+                <BaseText variant="h1" style={styles.title}>
+                    {t('carts.restaurantOrders')}
+                </BaseText>
+                <LanguageButton />
+                <BaseButton 
+                    title={t('common.refresh')} 
+                    onPress={handleRefresh}
+                    variant="primary"
+                    size="small"
+                />
             </View>
 
             <FlatList
@@ -121,8 +136,12 @@ export const MainScreen: React.FC = () => {
                 onRefresh={handleRefresh}
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
-                        <Text style={styles.emptyText}>No orders found</Text>
-                        <Text style={styles.emptySubtext}>Pull to refresh or add new orders</Text>
+                        <BaseText variant="h6" style={styles.emptyText}>
+                            {t('carts.noOrdersFound')}
+                        </BaseText>
+                        <BaseText variant="caption" style={styles.emptySubtext}>
+                            {t('carts.pullToRefresh')}
+                        </BaseText>
                     </View>
                 }
             />

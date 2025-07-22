@@ -12,6 +12,7 @@ import { TYPES } from './src/di/types';
 import { IDatabaseService } from './src/core/ports/services/IDatabaseService';
 import { UserListScreen } from './src/presentation/screens/UserListScreen';
 import { MainScreen } from './src/presentation/screens/MainScreen';
+import './src/presentation/i18n'; // Initialize i18n
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';

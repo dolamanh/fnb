@@ -1,6 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { User } from '../../core/entities/user/User';
+import { useTranslation } from 'react-i18next';
+import { BaseText } from './base/BaseText';
+import { BaseButton } from './base/BaseButton';
+import { BaseCard } from './base/BaseCard';
 
 interface UserItemProps {
   user: User;
@@ -9,44 +13,55 @@ interface UserItemProps {
 }
 
 export const UserItem: React.FC<UserItemProps> = ({ user, onEdit, onDelete }) => {
+  const { t } = useTranslation();
+
   const handleDelete = () => {
     Alert.alert(
-      'Delete User',
-      `Are you sure you want to delete ${user.name}?`,
+      t('users.deleteUser'),
+      t('users.confirmDelete'),
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: () => onDelete(user.id) },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('common.delete'), style: 'destructive', onPress: () => onDelete(user.id) },
       ]
     );
   };
 
   return (
-    <View style={styles.container}>
+    <BaseCard style={styles.container}>
       <View style={styles.userInfo}>
-        <Text style={styles.name}>{user.name}</Text>
-        <Text style={styles.email}>{user.email}</Text>
-        {user.phone && <Text style={styles.phone}>{user.phone}</Text>}
-        <Text style={styles.status}>
-          Status: {user.isActive ? 'Active' : 'Inactive'}
-        </Text>
+        <BaseText variant="h6" style={styles.name}>
+          {user.name}
+        </BaseText>
+        <BaseText variant="body2" style={styles.email}>
+          {user.email}
+        </BaseText>
+        {user.phone && (
+          <BaseText variant="caption" style={styles.phone}>
+            {user.phone}
+          </BaseText>
+        )}
+        <BaseText variant="caption" style={{...styles.status, color: user.isActive ? '#4CAF50' : '#F44336'}}>
+          {user.isActive ? 'Active' : 'Inactive'}
+        </BaseText>
       </View>
-      
+
       <View style={styles.actions}>
-        <TouchableOpacity
-          style={[styles.button, styles.editButton]}
+        <BaseButton
+          title={t('common.edit')}
           onPress={() => onEdit(user)}
-        >
-          <Text style={styles.buttonText}>Edit</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={[styles.button, styles.deleteButton]}
+          variant="outline"
+          size="small"
+          style={styles.editButton}
+        />
+        <BaseButton
+          title={t('common.delete')}
           onPress={handleDelete}
-        >
-          <Text style={styles.buttonText}>Delete</Text>
-        </TouchableOpacity>
+          variant="danger"
+          size="small"
+          style={styles.deleteButton}
+        />
       </View>
-    </View>
+    </BaseCard>
   );
 };
 

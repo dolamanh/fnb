@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Text,
   FlatList,
-  TouchableOpacity,
   StyleSheet,
-  ActivityIndicator,
-  RefreshControl,
   Modal,
   Platform,
+  RefreshControl,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { 
@@ -22,10 +19,16 @@ import { UserItem } from '../components/UserItem';
 import { UserForm } from '../components/UserForm';
 import { User } from '../../core/entities/user/User';
 import { testDI } from '../../debug/TestDI';
+import { useTranslation } from 'react-i18next';
+import { BaseText } from '../components/base/BaseText';
+import { BaseButton } from '../components/base/BaseButton';
+import { BaseLoading } from '../components/base/BaseLoading';
+import { LanguageButton } from '../components/base/LanguageButton';
 
 export const UserListScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const { users, loading, error } = useAppSelector((state) => state.users);
+  const { t } = useTranslation();
   
   const [showForm, setShowForm] = useState(false);
   const [editingUser, setEditingUser] = useState<User | undefined>();
@@ -61,12 +64,12 @@ export const UserListScreen: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleSaveUser = async (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleSaveUser = async (userData: Partial<User>) => {
     try {
       if (editingUser) {
         await dispatch(updateUserAction({ id: editingUser.id, userData })).unwrap();
       } else {
-        await dispatch(createUserAction(userData)).unwrap();
+        await dispatch(createUserAction(userData as Omit<User, 'id' | 'createdAt' | 'updatedAt'>)).unwrap();
       }
       setShowForm(false);
       setEditingUser(undefined);
@@ -91,32 +94,50 @@ export const UserListScreen: React.FC = () => {
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <Text style={styles.emptyStateText}>No users found</Text>
-      <TouchableOpacity style={styles.createButton} onPress={handleCreateUser}>
-        <Text style={styles.createButtonText}>Create First User</Text>
-      </TouchableOpacity>
+      <BaseText variant="h6" style={styles.emptyStateText}>
+        {t('users.noUsers')}
+      </BaseText>
+      <BaseButton
+        title={t('users.createFirstUser')}
+        onPress={handleCreateUser}
+        variant="primary"
+      />
     </View>
   );
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Users</Text>
-        <TouchableOpacity style={styles.addButton} onPress={handleCreateUser}>
-          <Text style={styles.addButtonText}>+ Add User</Text>
-        </TouchableOpacity>
+        <BaseText variant="h1" style={styles.title}>
+          {t('users.title')}
+        </BaseText>
+        <LanguageButton />
+        <BaseButton
+          title={t('users.addUser')}
+          onPress={handleCreateUser}
+          variant="primary"
+          size="small"
+        />
       </View>
 
       {error && (
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
+          <BaseText variant="body1" style={styles.errorText}>
+            {error}
+          </BaseText>
           <View style={styles.errorButtonContainer}>
-            <TouchableOpacity style={styles.retryButton} onPress={handleFetchUsers}>
-              <Text style={styles.retryButtonText}>Retry</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.clearButton} onPress={handleClearError}>
-              <Text style={styles.clearButtonText}>Clear</Text>
-            </TouchableOpacity>
+            <BaseButton
+              title={t('common.retry')}
+              onPress={handleFetchUsers}
+              variant="outline"
+              size="small"
+            />
+            <BaseButton
+              title={t('common.clear')}
+              onPress={handleClearError}
+              variant="outline"
+              size="small"
+            />
           </View>
         </View>
       )}
@@ -137,8 +158,10 @@ export const UserListScreen: React.FC = () => {
 
       {loading && users.length === 0 && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>Loading users...</Text>
+          <BaseLoading size="large" />
+          <BaseText variant="body1" style={styles.loadingText}>
+            {t('common.loading')}
+          </BaseText>
         </View>
       )}
 
@@ -149,9 +172,8 @@ export const UserListScreen: React.FC = () => {
       >
         <UserForm
           user={editingUser}
-          onSave={handleSaveUser}
+          onSubmit={handleSaveUser}
           onCancel={handleCancelForm}
-          loading={loading}
         />
       </Modal>
     </View>
