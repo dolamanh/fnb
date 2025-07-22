@@ -4,7 +4,6 @@ import {
   FlatList,
   StyleSheet,
   Modal,
-  Platform,
   RefreshControl,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../store/hooks';

@@ -5,6 +5,7 @@ import { TYPES } from './types';
 // Infrastructure implementations
 import { ApiService } from '../infrastructure/services/ApiService';
 import { DatabaseService } from '../infrastructure/services/DatabaseService';
+import { WebSocketService } from '../infrastructure/services/WebSocketService';
 import { UserRemoteDataSource } from '../infrastructure/datasources/remote/UserRemoteDataSource';
 import { UserLocalDataSource } from '../infrastructure/datasources/local/UserLocalDataSource';
 import { UserRepository } from '../infrastructure/repositories/UserRepository';
@@ -13,6 +14,7 @@ import { CartRemoteDataSource } from '../infrastructure/datasources/remote/CartR
 // Core ports
 import type { IApiService } from '../core/ports/services/IApiService';
 import type { IDatabaseService } from '../core/ports/services/IDatabaseService';
+import type { IWebSocketService } from '../core/ports/services/IWebSocketService';
 import type { IUserLocalDataSource } from '../core/ports/datasources/local/IUserLocalDataSource';
 import type { IUserRemoteDataSource } from '../core/ports/datasources/remote/IUserRemoteDataSource';
 import type { IUserRepository } from '../core/ports/repositories/IUserRepository';
@@ -22,6 +24,7 @@ import { GetUsersUseCase } from '../core/usecases/user/GetUsersUseCase';
 import { CreateUserUseCase } from '../core/usecases/user/CreateUserUseCase';
 import { UpdateUserUseCase } from '../core/usecases/user/UpdateUserUseCase';
 import { DeleteUserUseCase } from '../core/usecases/user/DeleteUserUseCase';
+import { WebSocketUseCases } from '../core/usecases/websocket/WebSocketUseCases';
 import { ICartRemoteDataSource } from '../core/ports/datasources/remote/ICartRemoteDataSource';
 import { CartRepository } from '../infrastructure/repositories/CartRepository';
 import { ICartRepository } from '../core/ports/repositories/ICartRepository';
@@ -37,6 +40,10 @@ container.bind(TYPES.ApiService).toDynamicValue(() => {
 
 container.bind(TYPES.DatabaseService).toDynamicValue(() => {
   return new DatabaseService();
+}).inSingletonScope();
+
+container.bind(TYPES.WebSocketService).toDynamicValue(() => {
+  return new WebSocketService();
 }).inSingletonScope();
 
 container.bind(TYPES.UserRemoteDataSource).toDynamicValue(() => {
@@ -84,6 +91,11 @@ container.bind(TYPES.UpdateUserUseCase).toDynamicValue(() => {
 container.bind(TYPES.DeleteUserUseCase).toDynamicValue(() => {
   const userRepository = container.get<IUserRepository>(TYPES.UserRepository);
   return new DeleteUserUseCase(userRepository);
+});
+
+container.bind(TYPES.WebSocketUseCases).toDynamicValue(() => {
+  const webSocketService = container.get<IWebSocketService>(TYPES.WebSocketService);
+  return new WebSocketUseCases(webSocketService);
 });
 
 container.bind(TYPES.GetCartsUseCase).toDynamicValue(() => {

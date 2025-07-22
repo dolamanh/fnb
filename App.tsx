@@ -1,17 +1,17 @@
 /**
- * FnB App with Clean Architecture + WatermelonDB + DI + Redux
+ * FnB App with Clean Architecture + WatermelonDB + DI + Redux + Navigation
  * @format
  */
 
 import React, { useEffect } from 'react';
-import { StatusBar, StyleSheet, useColorScheme, View, Alert, SafeAreaView, Platform } from 'react-native';
+import { StatusBar, useColorScheme, Alert, SafeAreaView } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import { store } from './src/presentation/store';
 import { container } from './src/di/container';
 import { TYPES } from './src/di/types';
 import { IDatabaseService } from './src/core/ports/services/IDatabaseService';
-import { UserListScreen } from './src/presentation/screens/UserListScreen';
-import { MainScreen } from './src/presentation/screens/MainScreen';
+import { RootStackNavigator } from './src/presentation/navigation/RootStackNavigator';
 import './src/presentation/i18n'; // Initialize i18n
 
 function App() {
@@ -34,18 +34,14 @@ function App() {
 
   return (
     <Provider store={store}>
-      <SafeAreaView style={styles.container}>
-        <MainScreen />
-      </SafeAreaView>
+      <NavigationContainer>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
+          <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+          <RootStackNavigator />
+        </SafeAreaView>
+      </NavigationContainer>
     </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-});
 
 export default App;

@@ -117,13 +117,15 @@ export const MainScreen: React.FC = () => {
                 <BaseText variant="h1" style={styles.title}>
                     {t('carts.restaurantOrders')}
                 </BaseText>
-                <LanguageButton />
-                <BaseButton 
-                    title={t('common.refresh')} 
-                    onPress={handleRefresh}
-                    variant="primary"
-                    size="small"
-                />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <LanguageButton />
+                    <BaseButton 
+                        title={t('common.refresh')} 
+                        onPress={handleRefresh}
+                        variant="primary"
+                        size="small"
+                    />
+                </View>
             </View>
 
             <FlatList

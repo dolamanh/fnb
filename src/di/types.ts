@@ -15,8 +15,10 @@ export const TYPES = {
   DeleteUserUseCase: Symbol.for('DeleteUserUseCase'),
 
   GetCartsUseCase: Symbol.for('GetCartsUseCase'),
+  WebSocketUseCases: Symbol.for('WebSocketUseCases'),
   
   // Services
   ApiService: Symbol.for('ApiService'),
   DatabaseService: Symbol.for('DatabaseService'),
+  WebSocketService: Symbol.for('WebSocketService'),
 };
